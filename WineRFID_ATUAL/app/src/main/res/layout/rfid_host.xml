@@ -11,7 +11,7 @@
     	android:layout_height="fill_parent"
     	android:orientation = "vertical"
     	>
-    	<ListView android:id="@+id/list_btdevice" 
+    	<ListView android:id="@+id/list_btdevice"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
 			android:layout_weight="12"
@@ -53,56 +53,30 @@
                 android:layout_marginRight="10dip" />
 
 		</LinearLayout>
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10px" >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Nível da Bateria" />
-
-            <TextView
-                android:id="@+id/batt_power"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:gravity="right"
-                android:text="Max" />
-
-        </LinearLayout>
-
-        <ProgressBar
-            android:id="@+id/batt_progress"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10px"
-            android:layout_marginRight="10px"
-            android:paddingLeft="10px"
-            android:paddingRight="10px"
-            />
 
 
 	<LinearLayout
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:orientation = "horizontal"
-		android:layout_weight="0">
+		android:layout_weight="0"
+		android:layout_marginTop="10dp">
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_weight="2"
 			android:textSize="50dip"
 			android:gravity="right"
-			android:text="Total:" />
+			android:text="Total:"
+			android:textColor="#146505" />
 		<TextView android:id="@+id/txt_tagcountInventory"
 			android:layout_width="wrap_content"
 			android:layout_height="fill_parent"
 			android:layout_weight="2"
 			android:textSize="50dip"
 			android:gravity="center"
-			android:text="0"/>
+			android:text="0"
+			android:textColor="#146505" />
 	</LinearLayout>
 
 		<LinearLayout
@@ -110,13 +84,13 @@
     		android:layout_height="fill_parent"
     		android:orientation = "horizontal"
     		android:layout_weight="0">
-            <ListView android:id="@+id/list_tag"
-                android:layout_width="fill_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="bottom"
-                android:layout_weight="12"
-                />
-    	</LinearLayout>
+
+			<ListView
+				android:layout_width="fill_parent"
+				android:layout_height="fill_parent"
+				android:id="@+id/listViewPaleteCad"
+				android:layout_margin="8dp" />
+		</LinearLayout>
 
 
     </LinearLayout>
@@ -346,7 +320,7 @@
                 <ListView
                     android:layout_width="fill_parent"
                     android:layout_height="154dp"
-                    android:id="@+id/listViewPaleteCad"
+                    android:id="@+id/listViewTagPaleteCad"
                     android:layout_margin="8dp" />
             </LinearLayout>
 
