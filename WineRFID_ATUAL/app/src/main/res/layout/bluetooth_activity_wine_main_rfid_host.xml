@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".activitys.WineMainActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.AppBarOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+    
+    <FrameLayout
+        android:id="@+id/fragment_containet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+                <ImageButton
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:id="@+id/imageButtonStart"
+                    android:layout_weight="5"
+                    android:layout_margin="2dp"
+                    android:background="@drawable/palet_boxes"
+                    android:baselineAlignBottom="true"
+                    android:clickable="true" />
+
+                <ImageButton
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:id="@+id/imageButtonSync"
+                    android:layout_weight="5"
+                    android:layout_margin="2dp"
+                    android:background="@drawable/cloud"
+                    android:baselineAlignBottom="true" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textAlignment="center"
+                    android:text="Iniciar"
+                    android:id="@+id/textView3"
+                    android:layout_weight="5"
+                    android:layout_gravity="center" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textAlignment="center"
+                    android:text="Sincronizar"
+                    android:id="@+id/textView4"
+                    android:layout_weight="5"
+                    android:layout_gravity="center" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageButton
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:id="@+id/imageButtonListProducts"
+                    android:layout_weight="5"
+                    android:layout_margin="2dp" />
+
+                <ImageButton
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:id="@+id/imageButton4"
+                    android:layout_weight="5"
+                    android:layout_margin="2dp" />
+            </LinearLayout>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textAlignment="center"
+                    android:text="Ver Produtos"
+                    android:id="@+id/textView5"
+                    android:layout_weight="5"
+                    android:layout_gravity="center" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textAlignment="center"
+                    android:text=""
+                    android:id="@+id/textView6"
+                    android:layout_weight="5"
+                    android:layout_gravity="center" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </FrameLayout>
+
+    </android.support.design.widget.CoordinatorLayout>

@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">WineRFID</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="hello">Hello World, RFIDHostActivity!</string>
+    <string name="spin_prompt_bank">NO MASK</string>
+    <string name="prompt_access_epc">PC/EPC</string>
+    <string name="prompt_lock_kill_pwd">Kill PWD skip</string>
+    <string name="prompt_lock_access_pwd">Access PWD skip</string>
+    <string name="prompt_lock_uii_mem">UII MEM skip</string>
+    <string name="prompt_lock_tid_mem">TID MEM skip</string>
+    <string name="prompt_lock_user_mem">User MEM skip</string>
+
+    <string name="prompt_config_query_session">S00</string>
+    <string name="prompt_config_target_ab">AB</string>
+    <string name="prompt_config_q">~ 32 tags</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_wine_rfidscan_bluetooth">WineRFIDScanBluetooth</string>
+
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

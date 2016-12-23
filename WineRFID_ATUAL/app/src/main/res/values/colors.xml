@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#F02336</color>
+    <color name="colorPrimaryDark">#F00336</color>
+    <color name="colorPrimaryLight">#FFCDD2</color>
+    <color name="colorAccent">#7C4DFF</color>
+    <color name="colorPrimaryText">#212121</color>
+    <color name="colorSecondarytext">#727272</color>
+    <color name="colorIcons">#FFFFFF</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorDivider">#868686</color>
+    <color name="colorTagSearched">#3e9128</color>
+    <color name="colorTagNotSearched">#df0e0e</color>
+
+    <color name="statusBarColor">#4169E1</color>
+    <color name="toolBarColor">#4682B4</color>
+
+</resources>

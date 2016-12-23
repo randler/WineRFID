@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"     
+    style="@android:style/TextAppearance.Medium"      
+    android:layout_width="wrap_content"      
+    android:layout_height="wrap_content"       
+    android:orientation="vertical"      
+    android:padding="5dp">  
+          
+    <TextView          
+        android:id="@+id/vendorId"          
+        style="@android:style/TextAppearance.Medium"          
+        android:layout_width="wrap_content"          
+        android:layout_height="wrap_content"          
+        android:paddingLeft="10dp" >      
+    </TextView>        
+    
+    <TextView          
+        android:id="@+id/productId"          
+        style="@android:style/TextAppearance.Medium"          
+        android:layout_width="wrap_content"          
+        android:layout_height="wrap_content"          
+        android:paddingLeft="10dp" >      
+    </TextView>     
+       
+    <TextView          
+        android:id="@+id/devicePath"          
+        style="@android:style/TextAppearance.Medium"          
+        android:layout_width="wrap_content"          
+        android:layout_height="wrap_content"          
+        android:paddingLeft="10dp" >      
+    </TextView>    
+    
+</LinearLayout> 

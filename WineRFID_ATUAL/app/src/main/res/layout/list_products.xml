@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:layout_width="fill_parent"
+    android:orientation="horizontal"
+    android:id="@+id/rowLayout"
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:id="@+id/tag_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Tag ID"
+        android:textColor="#000000"
+        android:layout_alignParentLeft="true"/>
+
+    <TextView
+        android:id="@+id/produto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/tag_id"
+        android:gravity="right"
+        android:textColor="#000000"
+        android:text="Produto" />
+
+    <TextView
+        android:id="@+id/n_palete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/produto"
+        android:textColor="#000000"
+        android:text="Numero do palete"
+        />
+    <TextView
+        android:id="@+id/lote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/n_palete"
+        android:text="Lote"
+        android:textColor="#000000"
+        />
+    <TextView
+        android:id="@+id/destino"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/lote"
+        android:text="Destino"
+        android:textColor="#000000"
+        />
+
+</RelativeLayout>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="list_menu_inventory">
+    	<item>Ver</item>
+    	<item>Apagar</item>
+    	<item>Cancelar</item>
+    </string-array>
+    <string-array name="spinner_bank">
+    	<item>NO MASK</item>
+    	<item>User Area</item>
+    	<item>TID Area</item>
+    	<item>UII Area</item>
+    	<item>RESERVED</item>
+    </string-array>
+    
+     <string-array name="spinner_access_epc">
+    	<item>PC/EPC</item>
+    	<item>Access PWD</item>
+    	<item>Kill PWD</item>
+    	<item>TID</item>
+    	<item>RESERVED</item>
+    	<item>UII Area</item>
+    	<item>TID Area</item>
+    	<item>User Area</item>
+    </string-array>
+    
+    <string-array name="spinner_lock_kill_pwd">
+    	<item>Kill PWD skip</item>
+    	<item>accessible</item>
+    	<item>secured accessible</item>
+    	<item>perma. accessible</item>
+    	<item>perma. inaccessible</item>
+    </string-array>
+    
+    <string-array name="spinner_lock_access_pwd">
+    	<item>Access PWD skip</item>
+    	<item>accessible</item>
+    	<item>secured accessible</item>
+    	<item>perma. accessible</item>
+    	<item>perma. inaccessible</item>
+    </string-array>
+    
+    <string-array name="spinner_lock_uii_mem">
+    	<item>UII MEM skip</item>
+    	<item>writeable</item>
+    	<item>secured writeable</item>
+    	<item>perma. writeable</item>
+    	<item>perma. un-writeable</item>
+    </string-array>
+   	
+   	<string-array name="spinner_lock_tid_mem">
+   	 	<item>TID MEM skip</item>
+    	<item>writeable</item>
+    	<item>secured writeable</item>
+    	<item>perma. writeable</item>
+    	<item>perma. un-writeable</item>
+    </string-array>
+    
+    <string-array name="spinner_lock_user_mem">
+     	<item>User MEM skip</item>
+    	<item>writeable</item>
+    	<item>secured writeable</item>
+    	<item>perma. writeable</item>
+    	<item>perma. un-writeable</item>
+    </string-array>
+    
+    <string-array name="spin_config_query_session">
+     	<item>S00</item>
+     	<item>S01</item>
+     	<item>S02</item>
+     	<item>S03</item>
+    </string-array>
+    
+    <string-array name="spin_config_target_ab">
+     	<item>A</item>
+     	<item>B</item>
+     	<item>AB</item>
+    </string-array>
+    
+    <string-array name="spin_config_q">
+     	<item>1 tag</item>
+     	<item>~ 2 tags</item>
+     	<item>~ 4 tags</item>
+     	<item>~ 8 tags</item>
+     	<item>~ 16 tags</item>
+     	<item>~ 32 tags</item>
+     	<item>~ 64 tags</item>
+     	<item>~ 128 tags</item>
+     	<item>~ 256 tags</item>
+     	<item>~ 512 tags</item>
+     	<item>~ 1024 tags</item>
+     	<item>~ 2048 tags</item>
+     	<item>~ 4096 tags</item>
+     	<item>~ 8092 tags</item>
+     	<item>~ 16384 tags</item>
+     	<item>~ 32768 tags</item>
+    </string-array>
+    
+</resources>
