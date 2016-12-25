@@ -111,6 +111,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     private TextView mBattPowerCad;
     private EditText mEdtTagGravada;
     private TextView mTxtTotalTagGravada;
+    private Button mBtnResetarContadorCadTag;
 
     private int estoque = 0;
     private  String newTagId = "";
@@ -129,7 +130,6 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     private Button mBtnLerPallet;
     private EditText mEdtTagPalletLido;
     private Button mBtnAdicionarCaixaPallet;
-    private ListView mListCaixas;
     private TextView mTxtTotalcaixasPallet;
     private Button mBtnRemoverUltimaCaixa;
     private Button mBtnSalvarPallet;
@@ -343,10 +343,9 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                 {
                     mBtnInventory.setEnabled(true);
                     mBtnReadTagCad.setEnabled(true);
-                    mBtnGravarTagCad.setEnabled(true);
-                    mBtnGravarOutraTagCad.setEnabled(true);
                     mSpinnerProdutoTagCad.setEnabled(true);
                     mBtnProcurar.setEnabled(true);
+                    mBtnLerPallet.setEnabled(true);
                     break;
                 }
                 case MSG_LINK_OFF:
@@ -357,6 +356,11 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                     mBtnGravarOutraTagCad.setEnabled(false);
                     mSpinnerProdutoTagCad.setEnabled(false);
                     mBtnProcurar.setEnabled(false);
+                    mBtnLerPallet.setEnabled(false);
+                    mBtnAdicionarCaixaPallet.setEnabled(false);
+                    mBtnRemoverUltimaCaixa.setEnabled(false);
+                    mBtnSalvarPallet.setEnabled(false);
+                    mBtnResetarContadorCadTag.setEnabled(false);
                     break;
                 }
                 case MSG_SOUND_RX:
@@ -568,6 +572,8 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         mBtnGravarTagCad.setOnClickListener(this);
         mBtnGravarOutraTagCad   = (Button) findViewById(R.id.buttonGravarOutraCadTag);
         mBtnGravarOutraTagCad.setOnClickListener(this);
+        mBtnResetarContadorCadTag = (Button) findViewById(R.id.buttonResetContadorCadTag);
+        mBtnResetarContadorCadTag.setOnClickListener(this);
 
 
         mEdtTagGravada          = (EditText) findViewById(R.id.editTextTagGravadaFinal);
@@ -876,6 +882,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         return mListTag != null;
     }
 */
+
     protected boolean initTagList( int id ) {
         mListTag = (ListView) findViewById(id);
         if( mListTag != null ) {
@@ -1003,20 +1010,83 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                 }
                 break;
 
+
+                // ----------------------------------------------------------- onClick Cadastrar Tag
             }case R.id.buttonReadCadTag:{
+                final String LABEL = ((Button) v).getText().toString().toUpperCase();
+                if (LABEL.equalsIgnoreCase("Ler Tag")) {
                     setarButton("ReadCadTag");
                     setOperation();
+                    ((Button) v).setText("Parar");
+                }else if (LABEL.equalsIgnoreCase("Parar")){
+                    ((Button) v).setText("Ler Tag");
+                    sendCmdStop();
+                }
 
                 break;
 
             }case R.id.buttonGravarCadTag:{
+                final String LABEL = ((Button) v).getText().toString().toUpperCase();
+                if (LABEL.equalsIgnoreCase("Gravar")) {
                     setarButton("GravarCadTag");
                     setOperation();
+                    ((Button) v).setText("Parar");
+                }else if(LABEL.equalsIgnoreCase("Parar")){
+                    ((Button) v).setText("Gravar");
+                    sendCmdStop();
+                }
 
                 break;
 
             }
-            // --- procurar
+            case R.id.buttonGravarOutraCadTag:{
+                final String LABEL = ((Button) v).getText().toString().toUpperCase();
+                if (LABEL.equalsIgnoreCase("Gravar Outra")) {
+                    setarButton("GravarOutraTag");
+                    setOperation();
+                    ((Button) v).setText("Parar");
+                }else if(LABEL.equalsIgnoreCase("Parar")){
+                    ((Button) v).setText("Gravar Outra");
+                    sendCmdStop();
+                }
+
+                break;
+            }
+
+            case R.id.buttonResetContadorCadTag:{
+                resetContadorCadTag();
+                break;
+            }
+            // ------------------------------------------------------------ onClick Cadastrar Pallet
+
+            case R.id.buttonLerPaleteCad:{
+                final String LABEL = ((Button) v).getText().toString().toUpperCase();
+                if (LABEL.equalsIgnoreCase("Ler Pallet")) {
+                    setarButton("LerPalletTag");
+                    setOperation();
+                    ((Button) v).setText("Parar");
+                }else if(LABEL.equalsIgnoreCase("Parar")){
+                    ((Button) v).setText("Ler Pallet");
+                    sendCmdStop();
+                }
+
+                break;
+
+            }
+            case R.id.buttonAdicionarCaixaPaleteCad:{
+
+                mBtnRemoverUltimaCaixa.setEnabled(true);
+                mBtnSalvarPallet.setEnabled(true);
+                break;
+            }
+            case R.id.buttonSalvarPaleteCad:{
+
+
+                resetBtnAndEdt();
+                break;
+            }
+
+            // -------------------------------------------------------------------- onClick procurar
             case R.id.btn_procurar:
             {
                 String tagEdit = mEdtTagProcurar.getText().toString();
@@ -1041,6 +1111,29 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                 break;
 
         }
+
+    }
+
+    private void resetBtnAndEdt(){
+        mEdtTagPalletLido.setText("");
+        //mArrTagPallet.clear();
+        mTxtTotalcaixasPallet.setText("00");
+        mBtnRemoverUltimaCaixa.setEnabled(false);
+        mBtnAdicionarCaixaPallet.setEnabled(false);
+        mBtnSalvarPallet.setEnabled(false);
+    }
+
+    private void resetContadorCadTag(){
+        estoque = 0;
+        mBtnResetarContadorCadTag.setEnabled(false);
+        mTxtTotalTagGravada.setText("00");
+        mEdtTagGravada.setText("");
+        mEdtTagCad.setText("");
+        mBtnGravarTagCad.setEnabled(false);
+        mBtnGravarOutraTagCad.setEnabled(false);
+        mBtnReadTagCad.setText("Ler Tag");
+        mBtnGravarTagCad.setText("Gravar");
+        mBtnGravarOutraTagCad.setText("Gravar Outra");
     }
 
     private void setOperation() {
@@ -1963,6 +2056,11 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                     }
                 } else if( mTabMode == TAB_CADASTRAR)
                 {
+                    if(estoque > 0){
+                        mBtnResetarContadorCadTag.setEnabled(true);
+                    }else{
+                        mBtnResetarContadorCadTag.setEnabled(false);
+                    }
                     final int idxComma = CMD.indexOf(",");
                     String [] saidaCMD = CMD.split(",");
                     if( idxComma > 4 )
@@ -1974,6 +2072,11 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                             Toast.makeText(this,"Tag Gravada", Toast.LENGTH_SHORT).show();
                             mTxtTotalTagGravada.setText(String.format("%03d", estoque));
                             mEdtTagGravada.setText(newTagId);
+                            mBtnGravarTagCad.setText("Gravar");
+                            mBtnGravarOutraTagCad.setText("Gravar Outra");
+
+                            mBtnGravarTagCad.setEnabled(false);
+                            mBtnGravarOutraTagCad.setEnabled(true);
 
                         }
                         if(erroGravar)
@@ -1999,6 +2102,8 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                     String [] erroCMD = CMD.split(",");
                     if(erroCMD[0].equalsIgnoreCase("err_tag=11")){
                         Toast.makeText(this,"Erro ao Gravar:"+ erroCMD[1].substring(2,erroCMD[1].length()-4) + "\nTente novamente!", Toast.LENGTH_SHORT).show();
+                        mBtnGravarTagCad.setText("Gravar");
+                        mBtnGravarOutraTagCad.setText("Gravar Outra");
                         erroGravar = true;
                         estoque--;
                     }
@@ -2028,6 +2133,8 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                 else if(BOTAO_GRAVAR_TAG_CAD) {
                     updateAccessDataWrite(param);
                 }
+            }else if(mTabMode == TAB_PALLET){
+                readTag(param);
             }else if( mTabMode == TAB_PROCURAR){
                 readTag(param);
             }
@@ -2177,10 +2284,26 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
 
         }else if (mTabMode == TAB_CADASTRAR) {
-            if(BOTAO_LER_TAG_CAD)
+            if(BOTAO_LER_TAG_CAD) {
                 mEdtTagCad.setText(tagId);
-        }
-        else if( mTabMode == TAB_PROCURAR ){
+                mBtnReadTagCad.setText("Ler Tag");
+                if(!mBtnGravarOutraTagCad.isEnabled())
+                mBtnGravarTagCad.setEnabled(true);
+
+            }
+        } else if(mTabMode == TAB_PALLET){
+            if(BOTAO_LER_PALLET_CAD){
+                mEdtTagPalletLido.setText(tagId);
+                mBtnLerPallet.setText("Ler Pallet");
+                mBtnAdicionarCaixaPallet.setEnabled(true);
+            }else if(BOTAO_ADICIONAR_CAIXA_PALLET){
+                //adicionar o tag id no listView
+
+                //caso preencha o list view habilitar o remover e salvar pallet
+            }
+
+
+        }else if( mTabMode == TAB_PROCURAR ){
 
         }
         resetVarButonCadTag();

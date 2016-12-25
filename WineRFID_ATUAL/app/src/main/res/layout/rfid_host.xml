@@ -174,7 +174,8 @@
 					android:id="@+id/buttonGravarCadTag"
 					android:layout_gravity="bottom|center"
 					android:layout_margin="10dp"
-					android:layout_weight="8" />
+					android:layout_weight="8"
+					android:enabled="false" />
 				<Button
 					android:layout_width="fill_parent"
 					android:layout_height="wrap_content"
@@ -232,6 +233,20 @@
 					android:textSize="30dp"
 					android:gravity="right"
 					android:textColor="#117100" />
+			</LinearLayout>
+
+			<LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+				android:gravity="bottom">
+
+				<Button
+					android:layout_width="fill_parent"
+					android:layout_height="wrap_content"
+					android:text="Reiniciar contador"
+					android:id="@+id/buttonResetContadorCadTag"
+					android:enabled="false" />
 			</LinearLayout>
 
 		</LinearLayout>
@@ -309,7 +324,8 @@
                     android:layout_height="wrap_content"
                     android:text="Adicionar Caixa"
                     android:id="@+id/buttonAdicionarCaixaPaleteCad"
-                    android:textSize="20dp" />
+                    android:textSize="20dp"
+					android:enabled="false" />
             </LinearLayout>
 
             <LinearLayout
@@ -354,22 +370,25 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal">
+                android:layout_height="match_parent"
+                android:layout_gravity="center_horizontal"
+				android:gravity="bottom">
 
                 <Button
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:text="Remover Ultima Caixa"
                     android:id="@+id/buttonRemoveCaixaPaleteTag"
-                    android:layout_weight="8" />
+                    android:layout_weight="8"
+					android:enabled="false" />
 
                 <Button
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:text="Salvar Palete"
                     android:id="@+id/buttonSalvarPaleteCad"
-                    android:layout_weight="8" />
+                    android:layout_weight="8"
+					android:enabled="false" />
             </LinearLayout>
         </LinearLayout>
 		</LinearLayout>
