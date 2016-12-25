@@ -110,8 +110,11 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     private ProgressBar mProgressCad;
     private TextView mBattPowerCad;
     private EditText mEdtTagGravada;
-    private TextView mEdtTotalTagGravada;
+    private TextView mTxtTotalTagGravada;
 
+    private int estoque = 0;
+    private  String newTagId = "";
+    private boolean erroGravar = false;
 
     private boolean BOTAO_LER_TAG_CAD                   = false;
     private boolean BOTAO_GRAVAR_TAG_CAD                = false;
@@ -130,6 +133,10 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     private TextView mTxtTotalcaixasPallet;
     private Button mBtnRemoverUltimaCaixa;
     private Button mBtnSalvarPallet;
+
+    protected ListView mListTagPallet;
+    private ArrayList<HashMap<String, String>> mArrTagPallet;
+    private BaseAdapter mAdapterTagPallet;
 
 
     // ---------------------------------------------------------------------------------- Inventorio
@@ -564,7 +571,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
 
         mEdtTagGravada          = (EditText) findViewById(R.id.editTextTagGravadaFinal);
-        mEdtTotalTagGravada     = (TextView) findViewById(R.id.textView1TotalTagGravada);
+        mTxtTotalTagGravada     = (TextView) findViewById(R.id.textView1TotalTagGravada);
 
         mSpinnerProdutoTagCad   = (Spinner) findViewById(R.id.spinnerCadTag);
         mSpinnerProdutoTagCad.setOnItemSelectedListener(this);
@@ -1006,7 +1013,6 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                     setarButton("GravarCadTag");
                     setOperation();
 
-
                 break;
 
             }
@@ -1048,6 +1054,10 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
         }else if(BOTAO_REMOVER_ULTIMA_CAIXA_PALLET){
 
+        }else if(BOTAO_LER_TAG_CAD){
+            configurarLeituraUnica();
+            sendCmdInventory();
+            //sendReadTag();
         }else if (BOTAO_SALVAR_PALLET){
 
         }else if(BOTAO_LER_TAG_GERAL){
@@ -1264,7 +1274,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         Set<BluetoothDevice> setDevice = mR900Manager.queryPairedDevices();
         Log.d(TAG, "refreshBluetoothDevice : " + setDevice.size());
     }
-
+/*
     public void setupOperationParameter()
     {
         sendInventParam(mSpinQuerySession.getSelectedItemPosition(),
@@ -1306,7 +1316,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
             }
         }
         setOpMode(mChkSingleTag.isChecked(), bUseMask, timeout, bQuerySelected);
-    }
+    }*/
 
     public void configurarLeituraUnica(){
 
@@ -1460,10 +1470,10 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
         int item = (int) mSpinnerProdutoTagCad.getSelectedItemPosition();
         String uuid = generateUUID();
-        int estoque = 1;
+        estoque ++;
         String TagCad = mEdtTagCad.getText().toString();
 
-        String newTagId = TagCad.substring(0,18) + uuid + produtosListCode.get(item) + String.format("%03d", estoque);
+        newTagId = TagCad.substring(0,18) + uuid + produtosListCode.get(item) + String.format("%03d", estoque);
 
         final String strTagPadrao = newTagId;
 
@@ -1488,6 +1498,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                                 }
                             }).create().show();
         }
+        resetVarButonCadTag();
     }
 
     public static final int LM_KILL_PWD_RW_LOCK     = 1 << 9;
@@ -1532,7 +1543,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                     }
                 } else {
                     Toast.makeText(this,
-                            "Permissição Negada",
+                         "Permissição Negada",
                             Toast.LENGTH_LONG).show();
                 }
                 return;
@@ -1874,8 +1885,11 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                 final int idxComma = CMD.indexOf(",");
                 final String mStrBattLevel = CMD.substring(idxComma + 1, CMD.length());
                 if(!BOTAO_GRAVAR_TAG_CAD)
-                    R900Status.setBatteryLevel(Integer.parseInt(mStrBattLevel));
+                    try {
+                        R900Status.setBatteryLevel(Integer.parseInt(mStrBattLevel));
+                    }catch (NumberFormatException ex){
 
+                    }
                 // set flag...
                 mBattflag = true;
                 return;
@@ -1950,11 +1964,20 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                 } else if( mTabMode == TAB_CADASTRAR)
                 {
                     final int idxComma = CMD.indexOf(",");
+                    String [] saidaCMD = CMD.split(",");
                     if( idxComma > 4 )
                     {
                         final String strNum = CMD.substring(4, idxComma);
                         //mStrAccessErrMsg = getEndMsg(strNum);
                         final String strErr = getEndMsg(strNum);
+                        if(saidaCMD[0].equalsIgnoreCase("end=0") && saidaCMD[1].equalsIgnoreCase("w") && !erroGravar){
+                            Toast.makeText(this,"Tag Gravada", Toast.LENGTH_SHORT).show();
+                            mTxtTotalTagGravada.setText(String.format("%03d", estoque));
+                            mEdtTagGravada.setText(newTagId);
+
+                        }
+                        if(erroGravar)
+                            erroGravar = false;
                         if( strErr != null )
                             mStrAccessErrMsg = strErr;
                     }
@@ -1973,6 +1996,12 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                 }
                 else if( mTabMode == TAB_CADASTRAR )
                 {
+                    String [] erroCMD = CMD.split(",");
+                    if(erroCMD[0].equalsIgnoreCase("err_tag=11")){
+                        Toast.makeText(this,"Erro ao Gravar:"+ erroCMD[1].substring(2,erroCMD[1].length()-4) + "\nTente novamente!", Toast.LENGTH_SHORT).show();
+                        erroGravar = true;
+                        estoque--;
+                    }
                    // updateAccessDataRead(param);
                     if(BOTAO_GRAVAR_TAG_CAD){
                         updateAccessDataWrite(param);
@@ -1996,12 +2025,15 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
             }else if( mTabMode == TAB_CADASTRAR ){
                 if(BOTAO_LER_TAG_CAD)
                     readTag(param);
-                else if(BOTAO_GRAVAR_TAG_CAD)
+                else if(BOTAO_GRAVAR_TAG_CAD) {
                     updateAccessDataWrite(param);
+                }
             }else if( mTabMode == TAB_PROCURAR){
                 readTag(param);
             }
         }
+
+
     }
 
     private void updateAccessDataWrite( final String param )
@@ -2043,7 +2075,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                     {
                         final String strOpError = strTagId.substring(7,
                                 strTagId.length());
-                        mStrAccessErrMsg = "Operation Error : " + strOpError;
+                        mStrAccessErrMsg = "Erro na operação: " + strOpError;
                     }
                     else
                         mStrAccessErrMsg = null;
@@ -2118,17 +2150,16 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
     private void readTag( final String param ) {
 
-        mStrAccessErrMsg = null;
-        boolean bUpdate = false;
-        String arrayString[] = param.split(",");
-        String tagId = arrayString[0].substring(0,arrayString[0].length()-4);
-
         if (param == null
-                || tagId.length() < 28
+                || param.length() < 28
                 || param.contains("Txp")
                 || param.contains("Txc"))
             return;
 
+        mStrAccessErrMsg = null;
+        boolean bUpdate = false;
+        String arrayString[] = param.split(",");
+        String tagId = arrayString[0].substring(0,arrayString[0].length()-4);
 
         if(mTabMode == TAB_INVENTORY){
 
