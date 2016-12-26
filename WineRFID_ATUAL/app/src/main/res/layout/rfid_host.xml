@@ -88,7 +88,7 @@
 			<ListView
 				android:layout_width="fill_parent"
 				android:layout_height="fill_parent"
-				android:id="@+id/listViewPaleteCad"
+				android:id="@+id/listViewInventory"
 				android:layout_margin="8dp" />
 		</LinearLayout>
 
@@ -331,12 +331,12 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="200dp">
 
                 <ListView
                     android:layout_width="fill_parent"
-                    android:layout_height="154dp"
-                    android:id="@+id/listViewTagPaleteCad"
+                    android:layout_height="fill_parent"
+                    android:id="@+id/listViewCaixasPallet"
                     android:layout_margin="8dp" />
             </LinearLayout>
 

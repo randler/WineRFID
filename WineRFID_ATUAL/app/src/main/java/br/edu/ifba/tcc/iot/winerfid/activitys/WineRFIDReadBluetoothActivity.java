@@ -252,6 +252,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     public static final int MSG_SHOW_TOAST              = 20;
     public static final int MSG_REFRESH_LIST_DEVICE     = 21;
     public static final int MSG_REFRESH_LIST_TAG        = 22;
+    public static final int MSG_REFRESH_LIST_TAG_PALLET = 23;
     public static final int MSG_LINK_ON                 = 30;
     public static final int MSG_LINK_OFF                = 31;
     public static final int MSG_SOUND_RX                = 40;
@@ -332,11 +333,20 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                     break;
                 case MSG_REFRESH_LIST_DEVICE:
                     mAdapterDevice.notifyDataSetChanged();
+
                     break;
+                case MSG_REFRESH_LIST_TAG_PALLET:{
+                    mTxtTotalcaixasPallet.setText(String.valueOf(mArrTagPallet.size()));
+                    mAdapterTagPallet.notifyDataSetChanged();
+
+                    break;
+                }
+
                 case MSG_REFRESH_LIST_TAG:
                 {
                     mTxtTagCount.setText(String.valueOf(mArrTag.size()));
                     mAdapterTag.notifyDataSetChanged();
+
                     break;
                 }
                 case MSG_LINK_ON:
@@ -542,8 +552,8 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         // ------------------------------------------------------ inicialização de dados necessários
         initArrayProducts();
         initBluetoothDeviceList(R.id.list_btdevice);
-        initTagList(R.id.listViewPaleteCad);
-        //initTagListPallet(R.id.listViewPaleteCad);
+        initTagList(R.id.listViewInventory);
+        initTagListPallet(R.id.listViewCaixasPallet);
 
 
 
@@ -868,20 +878,20 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         return mListDevice != null;
     }
 
-  /*  protected boolean initTagListPallet( int id ) {
+    protected boolean initTagListPallet( int id ) {
         mListTagPallet = (ListView) findViewById(id);
         if( mListTagPallet != null ) {
             mArrTagPallet = new ArrayList<HashMap<String, String>>();
             mAdapterTagPallet = new SimpleAdapter(this, mArrTagPallet,
-                    android.R.layout.simple_list_item_2, new String[]
+                    R.layout.list_item_inventory, new String[]
                     { "tag", "summary", "count", "first", "last"  }, new int[]
                     { android.R.id.text1 });
-            mListTag.setAdapter(mAdapterTagPallet);
+            mListTagPallet.setAdapter(mAdapterTagPallet);
 
         }
         return mListTag != null;
     }
-*/
+
 
     protected boolean initTagList( int id ) {
         mListTag = (ListView) findViewById(id);
@@ -890,7 +900,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
             mAdapterTag = new SimpleAdapter(this, mArrTag,
                     R.layout.list_item_inventory, new String[]
                     { "tag", "summary", "count", "first", "last" }, new int[]
-                    { android.R.id.text1, android.R.id.text2 });
+                    { android.R.id.text1});
             mListTag.setAdapter(mAdapterTag);
 
             // -- Context Menu
@@ -902,7 +912,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo ) {
-        if( v.getId() == R.id.listViewPaleteCad ) {
+        if( v.getId() == R.id.listViewInventory ) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
             menu.setHeaderTitle("Menu");
             HashMap<String, String> hashMap = (HashMap<String, String>) mListTag
@@ -924,16 +934,13 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         {
             case 0:
             {
-                //startMaskActivity();
+                clearArrTag();
                 break;
             }
             case 1:
             {
-                clearArrTag();
                 break;
             }
-            case 2:
-                break;
         }
         return true;
     }
@@ -975,7 +982,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     public void onClick( View v )
     {
         switch( v.getId() ) {
-            // --- Link
+            // --------------------------------------------------------------------- onClick Conexão
             case R.id.btn_scan:
                 BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
                 if (!btAdapter.isEnabled()) {
@@ -1047,6 +1054,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                     ((Button) v).setText("Parar");
                 }else if(LABEL.equalsIgnoreCase("Parar")){
                     ((Button) v).setText("Gravar Outra");
+                    BOTAO_ADICIONAR_CAIXA_PALLET = false;
                     sendCmdStop();
                 }
 
@@ -1069,14 +1077,24 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                     ((Button) v).setText("Ler Pallet");
                     sendCmdStop();
                 }
-
                 break;
 
             }
             case R.id.buttonAdicionarCaixaPaleteCad:{
+                final String LABEL = ((Button) v).getText().toString().toUpperCase();
+                if (LABEL.equalsIgnoreCase("Adicionar Caixa")) {
+                    setarButton("AdicionarCaixaPallet");
+                    setOperation();
+                    ((Button) v).setText("Parar Leitura");
+                }else if(LABEL.equalsIgnoreCase("Parar Leitura")){
+                    ((Button) v).setText("Adicionar Caixa");
+                    sendCmdStop();
+                }
 
-                mBtnRemoverUltimaCaixa.setEnabled(true);
-                mBtnSalvarPallet.setEnabled(true);
+                break;
+            }
+            case R.id.buttonRemoveCaixaPaleteTag:{
+                removerUltimaCaixa();
                 break;
             }
             case R.id.buttonSalvarPaleteCad:{
@@ -1114,6 +1132,22 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
     }
 
+    private void removerUltimaCaixa() {
+        if(mArrTagPallet.size() > 0){
+            mArrTagPallet.remove(mArrTagPallet.size()-1);
+            mHandler.sendEmptyMessage(MSG_REFRESH_LIST_TAG_PALLET);
+
+        }else{
+            Toast.makeText(this, "Nenhuma caixa adicionada!", Toast.LENGTH_SHORT).show();
+        }
+
+        if (mArrTagPallet.size() == 0){
+            mBtnRemoverUltimaCaixa.setEnabled(false);
+            mBtnSalvarPallet.setEnabled(false);
+
+        }
+    }
+
     private void resetBtnAndEdt(){
         mEdtTagPalletLido.setText("");
         //mArrTagPallet.clear();
@@ -1143,17 +1177,14 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         }else if(BOTAO_GRAVAR_TAG_CAD || BOTAO_GRAVAR_OUTRA_TAG_CAD){
             configurarLeituraUnica();
             sendWriteTag();
-        }else if (BOTAO_ADICIONAR_CAIXA_PALLET){
-
         }else if(BOTAO_REMOVER_ULTIMA_CAIXA_PALLET){
 
         }else if(BOTAO_LER_TAG_CAD){
             configurarLeituraUnica();
             sendCmdInventory();
-            //sendReadTag();
         }else if (BOTAO_SALVAR_PALLET){
 
-        }else if(BOTAO_LER_TAG_GERAL){
+        }else if(BOTAO_LER_TAG_GERAL || BOTAO_ADICIONAR_CAIXA_PALLET){
             configurarLeituraContinua();
             sendCmdInventory();
         }
@@ -1164,9 +1195,8 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         BOTAO_GRAVAR_TAG_CAD                = false;
         BOTAO_GRAVAR_OUTRA_TAG_CAD          = false;
         BOTAO_LER_PALLET_CAD                = false;
-        BOTAO_ADICIONAR_CAIXA_PALLET        = false;
         BOTAO_REMOVER_ULTIMA_CAIXA_PALLET   = false;
-        BOTAO_SALVAR_PALLET                 = false;;
+        BOTAO_SALVAR_PALLET                 = false;
     }
 
     private void setarButton(String readCadTag) {
@@ -1413,7 +1443,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
     public void configurarLeituraUnica(){
 
-        if(BOTAO_GRAVAR_TAG_CAD || BOTAO_GRAVAR_OUTRA_TAG_CAD || BOTAO_LER_TAG_CAD) {
+        if(BOTAO_GRAVAR_TAG_CAD || BOTAO_GRAVAR_OUTRA_TAG_CAD || BOTAO_LER_TAG_CAD || BOTAO_LER_PALLET_CAD) {
             sendSettingTxPower(TX_POWER[14]);
             sendSettingTxCycle(TX_DUTY_ON[10],TX_DUTY_OFF[10]);
         }
@@ -1461,7 +1491,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
     public void configurarLeituraContinua()
     {
-        if(BOTAO_LER_TAG_GERAL){
+        if(BOTAO_LER_TAG_GERAL || BOTAO_ADICIONAR_CAIXA_PALLET){
             sendSettingTxPower(TX_POWER[0]);
             sendSettingTxCycle(TX_DUTY_ON[0],TX_DUTY_OFF[0]);
         }
@@ -1550,12 +1580,12 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         return accAddr;
     }
 
-    public void sendReadTag()
+  /*  public void sendReadTag()
     {
         String strPwd = getPassword();// mEdtPassword.getText().toString();
         AccessAddress accAddr = getAccessAddress();
         sendReadTag(accAddr.len, accAddr.bank, accAddr.offset, strPwd);
-    }
+    }*/
 
     public void sendWriteTag()
     {
@@ -1883,6 +1913,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         // if( mHandler.hasMessages( MSG_REFRESH_LIST_TAG ) == false )
         // mHandler.sendEmptyMessageDelayed(MSG_REFRESH_LIST_TAG, 10);
         mHandler.sendEmptyMessage(MSG_REFRESH_LIST_TAG);
+        mHandler.sendEmptyMessage(MSG_REFRESH_LIST_TAG_PALLET);
     }
 
     private static final int MSG_TOAST = 100;
@@ -1991,19 +2022,16 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
             if( CMD.indexOf("$trigger=1") == 0 )
             {
-                if( mTabMode == TAB_INVENTORY )
-                {
+                if( mTabMode == TAB_INVENTORY ){
                     mBtnInventory.setText("Parar Leitura");
                     mBtnInventory.setEnabled(false);
                     configurarLeituraContinua();
                     sendCmdInventory();
-                }
-                else if( mTabMode == TAB_PROCURAR)
-                {
-                    //mBtnAccess.setText("Parar");
-                   // mBtnAccess.setEnabled(false);
-                   // configurarLeituraContinua();
-                    //sendCmdAccess();
+                }else if( mTabMode == TAB_PALLET){
+                    mBtnAdicionarCaixaPallet.setText("Parar Leitura");
+                    mBtnAdicionarCaixaPallet.setEnabled(false);
+                    configurarLeituraContinua();
+                    sendCmdInventory();
                 }
                 return;
             }
@@ -2014,9 +2042,8 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                     mBtnInventory.setEnabled(true);
                     sendCmdStop();
 
-                }else if( mTabMode == TAB_PROCURAR){
-                    //mBtnAccess.setText("Access");
-                   // mBtnAccess.setEnabled(true);
+                }else if( mTabMode == TAB_PALLET){
+                    mBtnAdicionarCaixaPallet.setEnabled(true);
                     sendCmdStop();
 
                 }else if(mTabMode == TAB_CADASTRAR){
@@ -2029,31 +2056,39 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
             else if( CMD.indexOf("$online=0") == 0 )
             {
                 setConnectionStatus(false);
-            }
-            else if( CMD.indexOf("end") == 0 )
-            {
-                if( mTabMode == TAB_INVENTORY )
-                {
+
+            }else if( CMD.indexOf("end") == 0 ){
+                if( mTabMode == TAB_INVENTORY ){
                     final int idxComma = CMD.indexOf(",");
-                    if( idxComma > 4 )
-                    {
+                    if( idxComma > 4 ){
                         final String strNum = CMD.substring(4, idxComma);
                         final String strErr = getEndMsg(strNum);
+
                         if( strErr != null )
                             mStrAccessErrMsg = strErr;
+
                     }
-                }
-                else if( mTabMode == TAB_PROCURAR)
-                {
+
+                }else if(mTabMode == TAB_PALLET){
                     final int idxComma = CMD.indexOf(",");
-                    if( idxComma > 4 )
-                    {
+                    if( idxComma > 4 ){
                         final String strNum = CMD.substring(4, idxComma);
                         //mStrAccessErrMsg = getEndMsg(strNum);
                         final String strErr = getEndMsg(strNum);
                         if( strErr != null )
                             mStrAccessErrMsg = strErr;
                     }
+
+                }else if( mTabMode == TAB_PROCURAR){
+                    final int idxComma = CMD.indexOf(",");
+                    if( idxComma > 4 ){
+                        final String strNum = CMD.substring(4, idxComma);
+                        //mStrAccessErrMsg = getEndMsg(strNum);
+                        final String strErr = getEndMsg(strNum);
+                        if( strErr != null )
+                            mStrAccessErrMsg = strErr;
+                    }
+
                 } else if( mTabMode == TAB_CADASTRAR)
                 {
                     if(estoque > 0){
@@ -2093,12 +2128,9 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
             }
             else if( CMD.indexOf("err") == 0 || CMD.indexOf("ok") == 0 )
             {
-                if( mTabMode == TAB_INVENTORY )
-                {
+                if( mTabMode == TAB_INVENTORY ){
 
-                }
-                else if( mTabMode == TAB_CADASTRAR )
-                {
+                }else if( mTabMode == TAB_CADASTRAR ){
                     String [] erroCMD = CMD.split(",");
                     if(erroCMD[0].equalsIgnoreCase("err_tag=11")){
                         Toast.makeText(this,"Erro ao Gravar:"+ erroCMD[1].substring(2,erroCMD[1].length()-4) + "\nTente novamente!", Toast.LENGTH_SHORT).show();
@@ -2127,14 +2159,18 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
             {
                 if( mLastCmd.equalsIgnoreCase(R900Protocol.CMD_INVENT) )
                     readTag(param);
+
+            }else if(mTabMode == TAB_PALLET){
+             if(mLastCmd.equalsIgnoreCase(R900Protocol.CMD_INVENT))
+                 readTag(param);
+
             }else if( mTabMode == TAB_CADASTRAR ){
                 if(BOTAO_LER_TAG_CAD)
                     readTag(param);
                 else if(BOTAO_GRAVAR_TAG_CAD) {
                     updateAccessDataWrite(param);
                 }
-            }else if(mTabMode == TAB_PALLET){
-                readTag(param);
+
             }else if( mTabMode == TAB_PROCURAR){
                 readTag(param);
             }
@@ -2200,61 +2236,6 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         }
     }
 
-    private void updateAccessDataRead( final String param )
-    {
-        if( param == null || param.length() <= 4 )
-            return;
-
-        mStrAccessErrMsg = null;
-        final String tagId = param.substring(0, param.length() - 4);
-
-
-        if( mHandler.hasMessages(MSG_SOUND_RX) == false )
-            mHandler.sendEmptyMessage(MSG_SOUND_RX);
-
-        final String packet = param.toLowerCase();
-        final int index = packet.indexOf(",e=");
-        if( index > 0 && ( index + 3 ) < ( packet.length() - 4 ) )
-        {
-            final String strTagId = packet.substring(0, index);
-            final String strTag = packet.substring(index + 3,
-                    packet.length() - 4);
-           // mEdtTagIdCad.setText(strTag);
-
-            boolean bStatusOk = true;
-            final int errTagPrefix = strTagId.indexOf("err_tag=");
-            if( errTagPrefix == 0 )
-            {
-                final String strTagError = strTagId.substring(8,
-                        strTagId.length());
-                mStrAccessErrMsg = getTagErrorMsg(strTagError);
-                bStatusOk = false;
-            }
-            else
-            {
-                final int errOpPrefix = strTagId.indexOf("err_op=");
-                if( errOpPrefix == 0 )
-                {
-                    final String strOpError = strTagId.substring(7,
-                            strTagId.length());
-                    mStrAccessErrMsg = "Operation Error : " + strOpError;
-                    bStatusOk = false;
-                }
-                else
-                    mStrAccessErrMsg = null;
-            }
-
-        }
-
-
-        // --
-        if( mChkSingleTag.isChecked() )
-        {
-            //mBtnAccess.setText("Access");
-
-        }
-    }
-
     private void readTag( final String param ) {
 
         if (param == null
@@ -2264,12 +2245,12 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
             return;
 
         mStrAccessErrMsg = null;
-        boolean bUpdate = false;
+
         String arrayString[] = param.split(",");
         String tagId = arrayString[0].substring(0,arrayString[0].length()-4);
 
         if(mTabMode == TAB_INVENTORY){
-
+            boolean bUpdate = false;
             for (HashMap<String, String> map : mArrTag) {
                 if (tagId.equals(map.get("tag"))) {
                     bUpdate = true;
@@ -2292,13 +2273,35 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
             }
         } else if(mTabMode == TAB_PALLET){
+            if(mArrTagPallet.size() > 0){
+                mBtnRemoverUltimaCaixa.setEnabled(true);
+                mBtnSalvarPallet.setEnabled(true);
+            }else{
+                mBtnRemoverUltimaCaixa.setEnabled(false);
+                mBtnSalvarPallet.setEnabled(false);
+            }
+
             if(BOTAO_LER_PALLET_CAD){
                 mEdtTagPalletLido.setText(tagId);
                 mBtnLerPallet.setText("Ler Pallet");
                 mBtnAdicionarCaixaPallet.setEnabled(true);
             }else if(BOTAO_ADICIONAR_CAIXA_PALLET){
+                boolean bUpdate = false;
                 //adicionar o tag id no listView
+                if(!tagId.equalsIgnoreCase(mEdtTagPalletLido.getText().toString())) {
+                    for (HashMap<String, String> map : mArrTagPallet) {
+                        if (tagId.equals(map.get("tag"))) {
+                            bUpdate = true;
+                            break;
+                        }
+                    }
+                    if (bUpdate == false) {
+                        HashMap<String, String> map = new HashMap<String, String>();
+                        map.put("tag", tagId);
+                        mArrTagPallet.add(map);
 
+                    }
+                }
                 //caso preencha o list view habilitar o remover e salvar pallet
             }
 

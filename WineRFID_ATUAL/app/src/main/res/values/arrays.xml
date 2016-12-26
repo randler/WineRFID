@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="list_menu_inventory">
-    	<item>Ver</item>
     	<item>Apagar</item>
     	<item>Cancelar</item>
     </string-array>
