@@ -47,7 +47,7 @@ public class WineListAdapterCustom extends ArrayAdapter<WineBean> {
 
             if(item.getTag_id() != null) {
                 tagid.setText   ("Tag ID: " + item.getTag_id());
-                n_palete.setText("Nº Palete: " + item.getN_palete());
+                n_palete.setText("Nº Palete: " + item.getCaixas_tag_id());
 
                 if (item.isSearch()) {
                     tagid.setTextColor      (Color.GREEN);

@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 
 import br.edu.ifba.tcc.iot.winerfid.R;
 import br.edu.ifba.tcc.iot.winerfid.adaptercustom.WineListAdapterCustom;
+import br.edu.ifba.tcc.iot.winerfid.bean.WineBean;
 import br.edu.ifba.tcc.iot.winerfid.bean.WineBeanTemp;
 import br.edu.ifba.tcc.iot.winerfid.fachadaBD.FachadaBD;
 import br.edu.ifba.tcc.iot.winerfid.fachadaWEB.FachadaWeb;
@@ -58,7 +59,7 @@ public class Estoque extends Activity {
 
     private void initiListWEB() {
         fachadaWeb = new FachadaWeb();
-        ArrayList <WineBeanTemp> arrayWEB = new ArrayList<WineBeanTemp>();
+        ArrayList <WineBean> arrayWEB = new ArrayList<WineBean>();
         String resposta = "";
 
 
@@ -70,10 +71,9 @@ public class Estoque extends Activity {
             JSONArray jsonArray = json.getJSONArray("resp");
 
             for (int i = 0; i < jsonArray.length(); i++){
-                WineBeanTemp wine = new WineBeanTemp();
+                WineBean wine = new WineBean();
 
-                wine.setTagId(jsonArray.getJSONObject(i).getString("tag_id"));
-                wine.setN_palete(jsonArray.getJSONObject(i).getString("n_palete"));
+                wine.setPalete_id(jsonArray.getJSONObject(i).getString("tag_id"));
 
                 arrayWEB.add(wine);
             }

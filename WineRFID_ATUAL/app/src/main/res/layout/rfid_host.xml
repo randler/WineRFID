@@ -794,6 +794,124 @@
 
 
 
-	<!-- Cadastrar Layout -->
+	<!-- Montar Pallet -->
+	<LinearLayout android:id="@+id/opt_motarpallet"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+		android:orientation="vertical">
+
+		<TextView
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceLarge"
+			android:text="Montar Pallet"
+			android:id="@+id/textView11"
+			android:layout_margin="5dp"
+			android:textColor="#244c22"
+			android:textSize="30dp"
+			android:gravity="center_horizontal" />
+
+
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content">
+
+		<Button
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:text="Ler Pallet"
+			android:id="@+id/buttonLerPalletMontar"
+			android:layout_margin="5dp" />
+	</LinearLayout>
+
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content">
+
+		<EditText
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:id="@+id/editTextlerPalletMontar"
+			android:enabled="false"
+			android:layout_margin="5dp" />
+	</LinearLayout>
+
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content">
+
+		<ListView
+			android:layout_width="fill_parent"
+			android:layout_height="200dp"
+			android:id="@+id/listViewMontar" />
+	</LinearLayout>
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content">
+
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Remover Caixa"
+			android:id="@+id/buttonRemoverCaixaMontar"
+			android:layout_weight="5"
+			android:enabled="false" />
+
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Adicionar Caixa"
+			android:id="@+id/buttonAdicionarCaixaMontar"
+			android:layout_weight="5"
+			android:enabled="false" />
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_margin="8dp">
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:text="Status: "
+			android:id="@+id/textView12"
+			android:layout_weight="5"
+			android:gravity="right"
+			android:layout_marginRight="5dp" />
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:text="Parado"
+			android:id="@+id/textViewStatusMontar"
+			android:layout_weight="4" />
+	</LinearLayout>
+
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:gravity="bottom">
+
+		<Button
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:text="Fechar Pallet"
+			android:id="@+id/buttonFecharPalletMontar"
+			android:layout_margin="5dp"
+			android:enabled="false" />
+	</LinearLayout>
+
+    </LinearLayout>
 
 </FrameLayout>

@@ -7,9 +7,9 @@ import java.util.ArrayList;
  */
 public class WineBean {
 
-    private ArrayList<String> tag_id = new ArrayList<String>();
-    private String n_palete;
-    private String data_cad;
+    private ArrayList<String> caixas_tag_id = new ArrayList<String>();
+    private String palete_id;
+    private String status_pedido_pallet;
     private boolean saida;
     private boolean search;
 
@@ -29,27 +29,39 @@ public class WineBean {
         this.search = search;
     }
 
-    public String getData_cad() {
-        return data_cad;
-    }
-
-    public void setData_cad(String data_cad) {
-        this.data_cad = data_cad;
-    }
-
     public ArrayList<String> getTag_id() {
-        return tag_id;
+        return caixas_tag_id;
     }
+
     public void addTagId(String id){
-        tag_id.add(id);
+        caixas_tag_id.add(id);
     }
 
-    public String getN_palete() {
-        return n_palete;
+    public ArrayList<String> getCaixas_tag_id() {
+        return caixas_tag_id;
     }
 
-    public void setN_palete(String n_palete) {
-        this.n_palete = n_palete;
+    public void setCaixas_tag_id(ArrayList<String> caixas_tag_id) {
+        this.caixas_tag_id = caixas_tag_id;
     }
 
+    public void addCaixa(String caixa){
+        caixas_tag_id.add(caixa);
+    }
+
+    public String getPalete_id() {
+        return palete_id;
+    }
+
+    public void setPalete_id(String palete_id) {
+        this.palete_id = palete_id;
+    }
+
+    public String getStatus_pedido_pallet() {
+        return status_pedido_pallet;
+    }
+
+    public void setStatus_pedido_pallet(String status_pedido_pallet) {
+        this.status_pedido_pallet = status_pedido_pallet;
+    }
 }

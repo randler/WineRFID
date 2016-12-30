@@ -31,7 +31,7 @@ public class BancoController {
         for (int i = 0; i < wine.getTag_id().size(); i++) {
             valores = new ContentValues();
 
-            valores.put(FachadaBD.getnPalete(), wine.getN_palete());
+            valores.put(FachadaBD.getnPalete(), wine.getPalete_id());
             valores.put(FachadaBD.getTagId(), wine.getTag_id().get(i));
 
             resultado = bd.insert(FachadaBD.getTABELA(), null, valores);

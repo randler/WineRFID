@@ -26,7 +26,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".activitys.WineRFIDReadBluetoothActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/CustomTheme">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

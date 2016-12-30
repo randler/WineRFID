@@ -91,8 +91,9 @@ public class FachadaWeb extends AsyncTask<String, Void, String>{
         JSONObject jsonObj = new JSONObject();
 
         try {
-            jsonObj.accumulate("tagid",     wine.getTag_id());
-            jsonObj.accumulate("n_palete",  wine.getN_palete());
+            jsonObj.accumulate("pallet_id",     wine.getPalete_id());
+            jsonObj.accumulate("caixas_pallet",     wine.getCaixas_tag_id());
+            jsonObj.accumulate("status_pedido", wine.getStatus_pedido_pallet());
 
 
             // 4. convert JSONObject to JSON to String
