@@ -105,11 +105,12 @@
 		<TextView
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:textAppearance="?android:attr/textAppearanceLarge"
 			android:text="CADASTRAR TAG"
 			android:id="@+id/textViewCadTag"
 			android:layout_gravity="center_horizontal"
-			android:layout_marginTop="10dp" />
+			android:layout_marginTop="10dp"
+			android:textColor="#284a26"
+			android:textSize="30dp" />
 
 		<LinearLayout
 			android:orientation="vertical"
@@ -273,14 +274,14 @@
                 <TextView
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="Cadasrar Pallet"
+					android:text="CADASTRAR PALLET"
                     android:id="@+id/textView2"
                     android:textAlignment="center"
                     android:textSize="30dp"
                     android:layout_gravity="center"
                     android:layout_margin="5dp"
-                    android:contextClickable="false" />
+                    android:contextClickable="false"
+					android:textColor="#284a26" />
             </LinearLayout>
 
             <LinearLayout
@@ -331,11 +332,11 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="fill_parent"
-                android:layout_height="200dp">
+                android:layout_height="150dp">
 
                 <ListView
                     android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
+                    android:layout_height="150dp"
                     android:id="@+id/listViewCaixasPallet"
                     android:layout_margin="8dp" />
             </LinearLayout>
@@ -401,11 +402,11 @@
 		<TextView
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:textSize="30sp"
+			android:textSize="30dp"
 			android:gravity="center"
 			android:id="@+id/btn_inventoryProcurar"
 			android:layout_centerHorizontal="true"
-			android:textColor="@android:color/holo_red_dark"
+			android:textColor="#284a26"
 			android:text="PROCURAR"/>
 
 		<LinearLayout
@@ -803,8 +804,7 @@
 		<TextView
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:textAppearance="?android:attr/textAppearanceLarge"
-			android:text="Montar Pallet"
+			android:text="MONTAR PALLET"
 			android:id="@+id/textView11"
 			android:layout_margin="5dp"
 			android:textColor="#244c22"
@@ -845,8 +845,9 @@
 
 		<ListView
 			android:layout_width="fill_parent"
-			android:layout_height="200dp"
-			android:id="@+id/listViewMontar" />
+			android:layout_height="150dp"
+			android:id="@+id/listViewMontar"
+			android:layout_margin="8dp" />
 	</LinearLayout>
 
 	<LinearLayout

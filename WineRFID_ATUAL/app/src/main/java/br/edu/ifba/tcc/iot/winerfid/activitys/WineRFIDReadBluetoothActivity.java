@@ -42,6 +42,10 @@ import android.widget.Toast;
 
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -125,6 +129,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     private boolean BOTAO_REMOVER_ULTIMA_CAIXA_PALLET   = false;
     private boolean BOTAO_SALVAR_PALLET                 = false;
     private boolean BOTAO_LER_TAG_GERAL                 = false;
+    private boolean BOTAO_LER_PALLET_MONTAR             = false;
 
     // ---------------------------------------------------------------------------- Cadastrar Pallet
     private Button mBtnLerPallet;
@@ -267,6 +272,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     public static final int MSG_REFRESH_LIST_DEVICE     = 21;
     public static final int MSG_REFRESH_LIST_TAG        = 22;
     public static final int MSG_REFRESH_LIST_TAG_PALLET = 23;
+    public static final int MSG_REFRESH_LIST_TAG_MONTAR = 24;
     public static final int MSG_LINK_ON                 = 30;
     public static final int MSG_LINK_OFF                = 31;
     public static final int MSG_SOUND_RX                = 40;
@@ -310,6 +316,49 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     //Android 6.0 permission
     private static final int REQUEST_COARSE_LOCATION_PERMISSIONS = 1;
 
+    private static final int MSG_REFRESH_TXT_STOP           = -1;
+    private static final int MSG_REFRESH_TXT_START          = 1;
+    private static final int MSG_REFRESH_TXT_SEARCH         = 2;
+    private static final int MSG_REFRESH_TXT_SEARCHED       = 3;
+    private static final int MSG_REFRESH_TXT_FINISH         = 4;
+    private static final int MSG_REFRESH_TXT_NOT_SEARCHED   = 5;
+    private static final int MSG_REFRESH_TXT_NOT_CONNECTION = 6;
+
+
+    private Handler mHandlerTxt = new Handler(){
+        @Override
+        public void handleMessage(final Message msg){
+            switch (msg.what){
+
+                case MSG_REFRESH_TXT_STOP:
+                    mTxtStatusMontar.setText("Desconectado.");
+                    break;
+                case MSG_REFRESH_TXT_START:
+                    mTxtStatusMontar.setText("Pesquisando...");
+                    break;
+                case MSG_REFRESH_TXT_SEARCH:
+                    mTxtStatusMontar.setText("Pesquisando na Internet.");
+                    break;
+                case MSG_REFRESH_TXT_SEARCHED:
+                    mTxtStatusMontar.setText("Preenchendo Lista com Caixas.");
+                    break;
+                case MSG_REFRESH_TXT_FINISH:
+                    mTxtStatusMontar.setText("Dados preenchidos. " +String.valueOf(mArrMontarPallet.size())+" Caixa(as)");
+                    mBtnAdicionarCaixaMontar.setEnabled(true);
+                    mBtnRemoverCaixaMontar.setEnabled(true);
+                    mBtnFecharPalletMontar.setEnabled(true);
+                    break;
+                case MSG_REFRESH_TXT_NOT_SEARCHED:
+                    mTxtStatusMontar.setText ("Pallet não encontrado.");
+                    break;
+                case MSG_REFRESH_TXT_NOT_CONNECTION:
+                    mTxtStatusMontar.setText("Sem Conexão. Pesquisando no Celular.");
+                    break;
+
+
+            }
+        }
+    };
 
     private Handler mHandler = new Handler()
     {
@@ -355,8 +404,9 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                     mAdapterTagPallet.notifyDataSetChanged();
 
                     break;
+                }case MSG_REFRESH_LIST_TAG_MONTAR:{
+                mAdapterMontarPallet.notifyDataSetChanged();
                 }
-
                 case MSG_REFRESH_LIST_TAG:
                 {
                     mTxtTagCount.setText(String.valueOf(mArrTag.size()));
@@ -366,26 +416,32 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                 }
                 case MSG_LINK_ON:
                 {
-                    mBtnInventory.setEnabled(true);
-                    mBtnReadTagCad.setEnabled(true);
-                    mSpinnerProdutoTagCad.setEnabled(true);
-                    mBtnProcurar.setEnabled(true);
-                    mBtnLerPallet.setEnabled(true);
+                    mBtnInventory           .setEnabled(true);
+                    mBtnReadTagCad          .setEnabled(true);
+                    mSpinnerProdutoTagCad   .setEnabled(true);
+                    mBtnProcurar            .setEnabled(true);
+                    mBtnLerPallet           .setEnabled(true);
+                    mBtnLerPalletMontar     .setEnabled(true);
                     break;
                 }
                 case MSG_LINK_OFF:
                 {
-                    mBtnInventory.setEnabled(false);
-                    mBtnReadTagCad.setEnabled(false);
-                    mBtnGravarTagCad.setEnabled(false);
-                    mBtnGravarOutraTagCad.setEnabled(false);
-                    mSpinnerProdutoTagCad.setEnabled(false);
-                    mBtnProcurar.setEnabled(false);
-                    mBtnLerPallet.setEnabled(false);
-                    mBtnAdicionarCaixaPallet.setEnabled(false);
-                    mBtnRemoverUltimaCaixa.setEnabled(false);
-                    mBtnSalvarPallet.setEnabled(false);
-                    mBtnResetarContadorCadTag.setEnabled(false);
+                    mBtnInventory               .setEnabled(false);
+                    mBtnReadTagCad              .setEnabled(false);
+                    mBtnGravarTagCad            .setEnabled(false);
+                    mBtnGravarOutraTagCad       .setEnabled(false);
+                    mSpinnerProdutoTagCad       .setEnabled(false);
+                    mBtnProcurar                .setEnabled(false);
+                    mBtnLerPallet               .setEnabled(false);
+                    mBtnAdicionarCaixaPallet    .setEnabled(false);
+                    mBtnRemoverUltimaCaixa      .setEnabled(false);
+                    mBtnSalvarPallet            .setEnabled(false);
+                    mBtnResetarContadorCadTag   .setEnabled(false);
+                    mBtnLerPalletMontar         .setEnabled(false);
+                    mBtnRemoverCaixaMontar      .setEnabled(false);
+                    mBtnAdicionarCaixaMontar    .setEnabled(false);
+                    mTxtStatusMontar            .setText("Desconectado");
+                    mBtnFecharPalletMontar      .setEnabled(false);
                     break;
                 }
                 case MSG_SOUND_RX:
@@ -579,6 +635,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         initBluetoothDeviceList(R.id.list_btdevice);
         initTagList(R.id.listViewInventory);
         initTagListPallet(R.id.listViewCaixasPallet);
+        initTagListMontarPallet(R.id.listViewMontar);
 
 
 
@@ -935,6 +992,20 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         return mListTag != null;
     }
 
+    protected boolean initTagListMontarPallet( int id ) {
+        mListMontarPallet = (ListView) findViewById(id);
+        if( mListMontarPallet != null ) {
+            mArrMontarPallet = new ArrayList<HashMap<String, String>>();
+            mAdapterMontarPallet = new SimpleAdapter(this, mArrMontarPallet,
+                    R.layout.list_item_inventory, new String[]
+                    { "tag", "summary", "count", "first", "last"  }, new int[]
+                    { android.R.id.text1 });
+            mListMontarPallet.setAdapter(mAdapterMontarPallet);
+
+        }
+        return mListTag != null;
+    }
+
 
     protected boolean initTagList( int id ) {
         mListTag = (ListView) findViewById(id);
@@ -1169,10 +1240,30 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
                 break;
             }
-            // --- Config
+
+            // ----------------------------------------------------------------------- Montar Pallet
+
+            case R.id.buttonLerPalletMontar:{
+                final String LABEL = ((Button) v).getText().toString().toUpperCase();
+                if (LABEL.equalsIgnoreCase("Ler Pallet")) {
+                    setarButton("lerPalletMontar");
+                    setOperation();
+                    ((Button) v).setText("Parar Leitura");
+                }else if(LABEL.equalsIgnoreCase("Parar Leitura")){
+                    ((Button) v).setText("Ler Pallet");
+                    sendCmdStop();
+                }
+
+                break;
+            }
+
+
+
+            // ------------------------------------------------------------------------ Configuração
             case R.id.chk_single_tag:
                 mSingleTag = mChkSingleTag.isChecked();
                 break;
+
 
         }
 
@@ -1230,7 +1321,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     }
 
     private void setOperation() {
-        if (BOTAO_LER_PALLET_CAD){
+        if (BOTAO_LER_PALLET_CAD || BOTAO_LER_PALLET_MONTAR){
             configurarLeituraUnica();
             sendCmdInventory();
         }else if(BOTAO_GRAVAR_TAG_CAD || BOTAO_GRAVAR_OUTRA_TAG_CAD){
@@ -1283,6 +1374,9 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                 break;
             case "LerGeral":
                 BOTAO_LER_TAG_GERAL = true;
+                break;
+            case "lerPalletMontar":
+                BOTAO_LER_PALLET_MONTAR = true;
                 break;
 
         }
@@ -1504,7 +1598,11 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
     public void configurarLeituraUnica(){
 
-        if(BOTAO_GRAVAR_TAG_CAD || BOTAO_GRAVAR_OUTRA_TAG_CAD || BOTAO_LER_TAG_CAD || BOTAO_LER_PALLET_CAD) {
+        if(BOTAO_GRAVAR_TAG_CAD ||
+                BOTAO_GRAVAR_OUTRA_TAG_CAD ||
+                BOTAO_LER_TAG_CAD ||
+                BOTAO_LER_PALLET_CAD ||
+                BOTAO_LER_PALLET_MONTAR) {
             sendSettingTxPower(TX_POWER[14]);
             sendSettingTxCycle(TX_DUTY_ON[10],TX_DUTY_OFF[10]);
         }
@@ -2234,6 +2332,8 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
             }else if( mTabMode == TAB_PROCURAR){
                 readTag(param);
+            }else if(mTabMode == TAB_MONTAR_PALLET){
+                readTag(param);
             }
         }
 
@@ -2369,8 +2469,93 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
         }else if( mTabMode == TAB_PROCURAR ){
 
+        }else if(mTabMode == TAB_MONTAR_PALLET){
+            if(BOTAO_LER_PALLET_MONTAR){
+                mEdtLerPalletMontar.setText(tagId);
+                preencherListViewMontar();
+            }
         }
         resetVarButonCadTag();
+    }
+
+    private void preencherListViewMontar() {
+    mHandlerTxt.sendEmptyMessage(MSG_REFRESH_TXT_START);
+
+        webInstance = new FachadaWeb();
+        String resposta = null;
+        boolean saida = false;
+        try {
+            resposta = webInstance.execute(webInstance.getHOME()).get();
+
+            if (resposta.equalsIgnoreCase("OK")) {
+                mHandlerTxt.sendEmptyMessage(MSG_REFRESH_TXT_SEARCH);
+                webInstance = new FachadaWeb();
+                resposta = webInstance.execute(webInstance.getLIST_WINE()).get();
+                 saida = sincDados(resposta);
+
+                if(saida){
+                    preencheListMontar();
+                }else{
+                    mHandlerTxt.sendEmptyMessage(MSG_REFRESH_TXT_NOT_SEARCHED);
+                }
+
+            }else{
+                mHandlerTxt.sendEmptyMessage(MSG_REFRESH_TXT_NOT_CONNECTION);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        
+    }
+
+    private void preencheListMontar() {
+        mHandlerTxt.sendEmptyMessage(MSG_REFRESH_TXT_SEARCHED);
+        mHandler.sendEmptyMessage(MSG_REFRESH_LIST_TAG_MONTAR);
+        mHandlerTxt.sendEmptyMessage(MSG_REFRESH_TXT_FINISH);
+    }
+
+    private boolean sincDados(String resposta) {
+        boolean saida = false;
+
+        JSONObject json = null;
+        int cont = 0, contWeb = 0;
+        try {
+            json = new JSONObject(resposta);
+            JSONArray respJson = json.getJSONArray("resp"); // get articles array
+            contWeb = respJson.length();
+            WineBean wine = new WineBean();
+
+            for (int i = 0; i <contWeb; i++){
+                wine.setPalete_id(respJson.getJSONObject(i).getString("pallet"));
+                wine.setStatus_pedido_pallet(respJson.getJSONObject(i).getString("status_pedido_pallet"));
+
+                if(wine.getPalete_id().equalsIgnoreCase(mEdtLerPalletMontar.getText().toString()) &&
+                        wine.getStatus_pedido_pallet().equalsIgnoreCase("Aberto")){
+                    JSONArray jArray = (JSONArray) respJson.getJSONObject(i).getJSONArray("caixas_tag");
+                    if(jArray != null){
+                        mArrMontarPallet.clear();
+                        mHandler.sendEmptyMessage(MSG_REFRESH_LIST_TAG_MONTAR);
+                        for (int j=0; j<jArray.length();j++){
+                            wine.addTagId(jArray.getString(j));
+                            HashMap<String, String> map = new HashMap<String, String>();
+                            map.put("tag", jArray.getString(j));
+                            mArrMontarPallet.add(map);
+
+                            saida = true;
+                        }
+                    }
+                    break;
+                }
+
+            }
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return saida;
     }
 
 
@@ -2379,7 +2564,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         mExit = true;
 
         sendCmdStop();
-        //mOp = false;	// eric 2012.11.23
+
         byeBluetoothDevice();
 
         mHandler.removeMessages(MSG_AUTO_LINK);

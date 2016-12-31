@@ -12,6 +12,7 @@ public class WineBean {
     private String status_pedido_pallet;
     private boolean saida;
     private boolean search;
+    private String caixasString;
 
     public boolean isSaida() {
         return saida;
@@ -63,5 +64,13 @@ public class WineBean {
 
     public void setStatus_pedido_pallet(String status_pedido_pallet) {
         this.status_pedido_pallet = status_pedido_pallet;
+    }
+
+    public String getCaixasString() {
+        return caixasString;
+    }
+
+    public void setCaixasString(String caixasString) {
+        this.caixasString = caixasString;
     }
 }
