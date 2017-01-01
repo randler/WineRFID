@@ -75,7 +75,9 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 {
 
 
+
     private ProgressDialog dialog;
+    private ProgressDialog mdialog;
     private TabHost mTab;
     private BarcodeDetector detector;
     public static SoundManager mSoundManager = new SoundManager();
@@ -130,6 +132,9 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     private boolean BOTAO_SALVAR_PALLET                 = false;
     private boolean BOTAO_LER_TAG_GERAL                 = false;
     private boolean BOTAO_LER_PALLET_MONTAR             = false;
+    private boolean BOTAO_ADICIONAR_CAIXA_MONTAR        = false;
+    private boolean BOTAO_REMOVER_CAIXA_MONTAR          = false;
+    private boolean BOTAO_FECHAR_PALLET_MONTAR          = false;
 
     // ---------------------------------------------------------------------------- Cadastrar Pallet
     private Button mBtnLerPallet;
@@ -147,6 +152,9 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
     private Button mBtnLerPalletMontar;
     private EditText mEdtLerPalletMontar;
+
+    private ArrayList<String> ArrayAdicionarMontar  = new ArrayList<String>();
+    private ArrayList<String> ArrayRemoverMontar    = new ArrayList<String>();
 
     private ListView mListMontarPallet;
     private ArrayList<HashMap<String, String>> mArrMontarPallet;
@@ -316,13 +324,14 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     //Android 6.0 permission
     private static final int REQUEST_COARSE_LOCATION_PERMISSIONS = 1;
 
-    private static final int MSG_REFRESH_TXT_STOP           = -1;
-    private static final int MSG_REFRESH_TXT_START          = 1;
-    private static final int MSG_REFRESH_TXT_SEARCH         = 2;
-    private static final int MSG_REFRESH_TXT_SEARCHED       = 3;
-    private static final int MSG_REFRESH_TXT_FINISH         = 4;
-    private static final int MSG_REFRESH_TXT_NOT_SEARCHED   = 5;
-    private static final int MSG_REFRESH_TXT_NOT_CONNECTION = 6;
+    private static final int MSG_REFRESH_TXT_STOP               = -1;
+    private static final int MSG_REFRESH_TXT_START              = 1;
+    private static final int MSG_REFRESH_TXT_SEARCH             = 2;
+    private static final int MSG_REFRESH_TXT_SEARCHED           = 3;
+    private static final int MSG_REFRESH_TXT_FINISH             = 4;
+    private static final int MSG_REFRESH_TXT_NOT_SEARCHED_NET   = 5;
+    private static final int MSG_REFRESH_TXT_NOT_SEARCHED_BD    = 6;
+    private static final int MSG_REFRESH_TXT_NOT_CONNECTION     = 7;
 
 
     private Handler mHandlerTxt = new Handler(){
@@ -347,12 +356,18 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                     mBtnAdicionarCaixaMontar.setEnabled(true);
                     mBtnRemoverCaixaMontar.setEnabled(true);
                     mBtnFecharPalletMontar.setEnabled(true);
+                    mBtnLerPalletMontar.setText("Ler Pallet");
                     break;
-                case MSG_REFRESH_TXT_NOT_SEARCHED:
+                case MSG_REFRESH_TXT_NOT_SEARCHED_NET:
                     mTxtStatusMontar.setText ("Pallet não encontrado.");
+
+                    mBtnLerPalletMontar.setText("Ler Pallet");
                     break;
                 case MSG_REFRESH_TXT_NOT_CONNECTION:
                     mTxtStatusMontar.setText("Sem Conexão. Pesquisando no Celular.");
+                    break;
+                case MSG_REFRESH_TXT_NOT_SEARCHED_BD:
+                    mTxtStatusMontar.setText("Dados não encontrado no celular.");
                     break;
 
 
@@ -405,8 +420,13 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
                     break;
                 }case MSG_REFRESH_LIST_TAG_MONTAR:{
-                mAdapterMontarPallet.notifyDataSetChanged();
-                }
+                    mBtnAdicionarCaixaMontar.setEnabled(true);
+                    mBtnRemoverCaixaMontar.setEnabled(true);
+                    mBtnFecharPalletMontar.setEnabled(true);
+                    mListMontarPallet.setEnabled(true);
+                    mAdapterMontarPallet.notifyDataSetChanged();
+                    mTxtStatusMontar.setText("Total de: "+ mArrMontarPallet.size() + " Caixa(as)");
+            }
                 case MSG_REFRESH_LIST_TAG:
                 {
                     mTxtTagCount.setText(String.valueOf(mArrTag.size()));
@@ -813,6 +833,93 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         setConnectionStatus(false);
     }
 
+    private static final int CONEXAO_OK = 1;
+    private static final int NOT_SEARCHED = 0;
+    private static final int SYNC_OK = 2;
+    private static final int FAIL_SYNC = 3;
+    private static final int SYNCING = 4;
+    private static final int FAIL = -1;
+
+    private void iniciarSync() {
+        dialog = ProgressDialog.show(this, "Pesquisando","Aguarde...");
+        dialog.setIcon(R.drawable.clousync);
+        dialog.setCancelable(false);
+
+        new Thread(){
+
+            public void run(){
+                try {
+                    webInstance = new FachadaWeb();
+                    String resposta = webInstance.execute(webInstance.getHOME()).get();
+
+                    if (resposta.equalsIgnoreCase("OK")) {
+                        webInstance = new FachadaWeb();
+                        resposta = webInstance.execute(webInstance.getLIST_WINE()).get();
+                        if(!resposta.equalsIgnoreCase(""))
+                            progressHandler.sendEmptyMessage(SYNCING);
+                        if(!sincDados(resposta))
+                            progressHandler.sendEmptyMessage(NOT_SEARCHED);
+                        Thread.sleep(2000);
+                    }else{
+                        progressHandler.sendEmptyMessage(FAIL);
+                        Thread.sleep(2000);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+
+                dialog.dismiss();
+
+            }
+        }.start();
+    }
+
+
+    Handler progressHandler = new Handler() {
+        public void handleMessage(Message msg) {;
+
+            switch (msg.what) {
+                case CONEXAO_OK:
+                    dialog.setMessage("Conectado...");
+                    break;
+                case FAIL:
+                    dialog.setIcon(R.drawable.clousync_fail);
+                    dialog.setMessage("Falha ao conectar...");
+                    mTxtStatusMontar.setText("Sem Conexão.");
+                    break;
+                case SYNCING:
+                    dialog.setMessage("Preenchendo Lista!");
+                    dialog.setIcon(R.drawable.clousync_progress);
+                    break;
+                case SYNC_OK:
+                    dialog.setMessage("Lista Preenchida com sucesso!");
+                    dialog.setIcon(R.drawable.clousync_ok);
+                    mBtnLerPalletMontar.setText("Ler Pallet");
+                    mTxtStatusMontar.setText("Total: " + mArrMontarPallet.size() + " Caixa(as)");
+                    break;
+                case FAIL_SYNC:
+                    dialog.setMessage("Falha ao Sincronizar!");
+                    mTxtStatusMontar.setText("Falha ao sincronizar.");
+                    break;
+                case NOT_SEARCHED:
+                    dialog.setMessage("Pallet não encontrado!");
+                    mTxtStatusMontar.setText("Pallet Não encontrado!");
+                    mArrMontarPallet.clear();
+                    mListMontarPallet.setEnabled(false);
+                    mBtnAdicionarCaixaMontar.setEnabled(false);
+                    mBtnRemoverCaixaMontar.setEnabled(false);
+                    mBtnFecharPalletMontar.setEnabled(false);
+                    mAdapterMontarPallet.notifyDataSetChanged();
+                    break;
+            }
+
+
+        }
+    };
+
+
     private void initArrayProducts(){
         //produtos cadastrados
         produtosList.add("01-ADEGA DO VALE SECO");
@@ -1147,14 +1254,19 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                 break;
 
             }case R.id.buttonGravarCadTag:{
-                final String LABEL = ((Button) v).getText().toString().toUpperCase();
-                if (LABEL.equalsIgnoreCase("Gravar")) {
-                    setarButton("GravarCadTag");
-                    setOperation();
-                    ((Button) v).setText("Parar");
-                }else if(LABEL.equalsIgnoreCase("Parar")){
-                    ((Button) v).setText("Gravar");
-                    sendCmdStop();
+
+                if(mSpinnerProdutoTagCad.getSelectedItemPosition() == 18){
+                    Toast.makeText(this, ""+ mSpinnerProdutoTagCad.getSelectedItemPosition(), Toast.LENGTH_SHORT).show();
+                }else {
+                    final String LABEL = ((Button) v).getText().toString().toUpperCase();
+                    if (LABEL.equalsIgnoreCase("Gravar")) {
+                        setarButton("GravarCadTag");
+                        setOperation();
+                        ((Button) v).setText("Parar");
+                    } else if (LABEL.equalsIgnoreCase("Parar")) {
+                        ((Button) v).setText("Gravar");
+                        sendCmdStop();
+                    }
                 }
 
                 break;
@@ -1257,7 +1369,31 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                 break;
             }
 
+            case R.id.buttonAdicionarCaixaMontar:{
+                final String LABEL = ((Button) v).getText().toString().toUpperCase();
+                if (LABEL.equalsIgnoreCase("Adicionar Caixa")) {
+                    setarButton("adicionarCaixaMontar");
+                    setOperation();
+                }
+                break;
+            }
+            case R.id.buttonRemoverCaixaMontar:{
+                final String LABEL = ((Button) v).getText().toString().toUpperCase();
+                if (LABEL.equalsIgnoreCase("Remover Caixa")) {
+                    setarButton("removerCaixaMontar");
+                    setOperation();
+                }
 
+                break;
+            }
+            case R.id.buttonFecharPalletMontar:{
+                if(salvarPalletMontar()) {
+                    resetButonsMontar();
+                    Toast.makeText(this,"Atualizado com Sucesso!", Toast.LENGTH_SHORT).show();
+                }
+
+                break;
+            }
 
             // ------------------------------------------------------------------------ Configuração
             case R.id.chk_single_tag:
@@ -1267,6 +1403,43 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
         }
 
+    }
+
+    private boolean salvarPalletMontar() {
+            boolean saida = false;
+
+            WineBean wine = new WineBean();
+
+            wine.setPalete_id(mEdtLerPalletMontar.getText().toString());
+            wine.setStatus_pedido_pallet("Alterado");
+
+            for (int i = 0; i < mArrMontarPallet.size(); i++){
+                wine.addTagId(mArrMontarPallet.get(i).get("tag"));
+            }
+
+
+            webInstance = new FachadaWeb();
+            webInstance.setWine(wine);
+
+            try {
+                String resposta = webInstance.execute(webInstance.getUPDATE_WINE()).get();
+                if(resposta.equalsIgnoreCase("Atualizado com sucesso!"))
+                    saida = true;
+            }catch (Exception e){
+
+            }
+            return saida;
+
+    }
+
+    private void resetButonsMontar() {
+        mEdtLerPalletMontar.setText("");
+        mArrMontarPallet.clear();
+        mAdapterMontarPallet.notifyDataSetChanged();
+        mBtnAdicionarCaixaMontar.setEnabled(false);
+        mBtnRemoverCaixaMontar.setEnabled(false);
+        mTxtStatusMontar.setText("Pallet Atualizado");
+        mBtnFecharPalletMontar.setEnabled(false);
     }
 
     private boolean salved() {
@@ -1332,12 +1505,34 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         }else if(BOTAO_LER_TAG_CAD){
             configurarLeituraUnica();
             sendCmdInventory();
-        }else if (BOTAO_SALVAR_PALLET){
-
         }else if(BOTAO_LER_TAG_GERAL || BOTAO_ADICIONAR_CAIXA_PALLET){
             configurarLeituraContinua();
             sendCmdInventory();
+        }else if (BOTAO_ADICIONAR_CAIXA_MONTAR){
+            criarDialog("Adicionar Caixa");
+            configurarLeituraUnica();
+            sendCmdInventory();
+        }else if(BOTAO_REMOVER_CAIXA_MONTAR){
+            criarDialog("Remover Caixa");
+            configurarLeituraUnica();
+            sendCmdInventory();
         }
+    }
+
+    private void criarDialog(final String title) {
+        mdialog = ProgressDialog.show(this,title , "Aproxime Da Tag");
+        mdialog.setIcon(R.drawable.cadtag);
+        mdialog.setCancelable(false);
+        mdialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancelar",
+                new DialogInterface.OnClickListener(){
+
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        sendCmdStop();
+                        mBtnAdicionarCaixaMontar.setText(title);
+                        mdialog.dismiss();
+                    }
+                });
     }
 
     private void resetVarButonCadTag(){
@@ -1345,8 +1540,14 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         BOTAO_GRAVAR_TAG_CAD                = false;
         BOTAO_GRAVAR_OUTRA_TAG_CAD          = false;
         BOTAO_LER_PALLET_CAD                = false;
+        BOTAO_ADICIONAR_CAIXA_PALLET        = false;
         BOTAO_REMOVER_ULTIMA_CAIXA_PALLET   = false;
         BOTAO_SALVAR_PALLET                 = false;
+        BOTAO_LER_TAG_GERAL                 = false;
+        BOTAO_LER_PALLET_MONTAR             = false;
+        BOTAO_ADICIONAR_CAIXA_MONTAR        = false;
+        BOTAO_REMOVER_CAIXA_MONTAR          = false;
+        BOTAO_FECHAR_PALLET_MONTAR          = false;
     }
 
     private void setarButton(String readCadTag) {
@@ -1378,7 +1579,15 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
             case "lerPalletMontar":
                 BOTAO_LER_PALLET_MONTAR = true;
                 break;
-
+            case "adicionarCaixaMontar":
+                BOTAO_ADICIONAR_CAIXA_MONTAR = true;
+                break;
+            case "removerCaixaMontar":
+                BOTAO_REMOVER_CAIXA_MONTAR = true;
+                break;
+            case "fecharPalletMontar":
+                BOTAO_FECHAR_PALLET_MONTAR = true;
+                break;
         }
 
     }
@@ -1598,14 +1807,9 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
     public void configurarLeituraUnica(){
 
-        if(BOTAO_GRAVAR_TAG_CAD ||
-                BOTAO_GRAVAR_OUTRA_TAG_CAD ||
-                BOTAO_LER_TAG_CAD ||
-                BOTAO_LER_PALLET_CAD ||
-                BOTAO_LER_PALLET_MONTAR) {
             sendSettingTxPower(TX_POWER[14]);
             sendSettingTxCycle(TX_DUTY_ON[10],TX_DUTY_OFF[10]);
-        }
+
 
         sendInventParam(mSpinQuerySession.getSelectedItemPosition(),
                 mSpinQueryQ.getSelectedItemPosition(),
@@ -2208,6 +2412,8 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                 }else if(mTabMode == TAB_CADASTRAR){
                     sendCmdStop();
 
+                }else if(mTabMode == TAB_MONTAR_PALLET){
+                    sendCmdStop();
                 }
 
                 return;
@@ -2420,7 +2626,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
             }
             if (bUpdate == false) {
                 HashMap<String, String> map = new HashMap<String, String>();
-                map.put("tag", tagId);
+                map.put("tag", tagId.trim());
                 mArrTag.add(map);
             }
 
@@ -2444,7 +2650,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
             if(BOTAO_LER_PALLET_CAD){
                 mEdtTagPalletLido.setText(tagId);
-                mBtnLerPallet.setText("Ler Pallet");
+                mBtnLerPalletMontar.setText("Ler Pallet");
                 mBtnAdicionarCaixaPallet.setEnabled(true);
             }else if(BOTAO_ADICIONAR_CAIXA_PALLET){
                 boolean bUpdate = false;
@@ -2458,62 +2664,87 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                     }
                     if (bUpdate == false) {
                         HashMap<String, String> map = new HashMap<String, String>();
-                        map.put("tag", tagId);
+                        map.put("tag", tagId.trim());
                         mArrTagPallet.add(map);
 
                     }
                 }
-                //caso preencha o list view habilitar o remover e salvar pallet
             }
 
 
         }else if( mTabMode == TAB_PROCURAR ){
 
+
+
         }else if(mTabMode == TAB_MONTAR_PALLET){
             if(BOTAO_LER_PALLET_MONTAR){
                 mEdtLerPalletMontar.setText(tagId);
-                preencherListViewMontar();
+                iniciarSync();
+                mBtnLerPalletMontar.setText("Ler Pallet");
+                mListMontarPallet.setEnabled(true);
+
+            }else if(BOTAO_ADICIONAR_CAIXA_MONTAR){
+                if(adicionarNotEqual(tagId) && !tagId.equalsIgnoreCase(mEdtLerPalletMontar.getText().toString())) {
+                    mTxtStatusMontar.setText("Add: " + tagId);
+                    HashMap<String, String> map = new HashMap<String, String>();
+                    map.put("tag", tagId.trim());
+                    mArrMontarPallet.add(map);
+                    mHandler.sendEmptyMessage(MSG_REFRESH_LIST_TAG_MONTAR);
+                    mBtnAdicionarCaixaMontar.setText("Adicionar Caixa");
+
+                }
+                sendCmdStop();
+                try {
+                    mdialog.dismiss();
+                }catch (NullPointerException ex){
+
+                }
+            }else if(BOTAO_REMOVER_CAIXA_MONTAR){
+                if(!tagId.equalsIgnoreCase(mEdtLerPalletMontar.getText().toString())){
+                    if (removeIsEqual(tagId)) {
+                        mTxtStatusMontar.setText("Rmv: " + tagId);
+                        mHandler.sendEmptyMessage(MSG_REFRESH_LIST_TAG_MONTAR);
+                        mBtnRemoverCaixaMontar.setText("Remover Caixa");
+                    }
+                }
+                sendCmdStop();
+                try {
+                    mdialog.dismiss();
+                }catch (NullPointerException ex){
+
+                }
             }
         }
         resetVarButonCadTag();
     }
 
-    private void preencherListViewMontar() {
-    mHandlerTxt.sendEmptyMessage(MSG_REFRESH_TXT_START);
-
-        webInstance = new FachadaWeb();
-        String resposta = null;
+    private boolean removeIsEqual(String tagId) {
         boolean saida = false;
-        try {
-            resposta = webInstance.execute(webInstance.getHOME()).get();
-
-            if (resposta.equalsIgnoreCase("OK")) {
-                mHandlerTxt.sendEmptyMessage(MSG_REFRESH_TXT_SEARCH);
-                webInstance = new FachadaWeb();
-                resposta = webInstance.execute(webInstance.getLIST_WINE()).get();
-                 saida = sincDados(resposta);
-
-                if(saida){
-                    preencheListMontar();
-                }else{
-                    mHandlerTxt.sendEmptyMessage(MSG_REFRESH_TXT_NOT_SEARCHED);
-                }
-
-            }else{
-                mHandlerTxt.sendEmptyMessage(MSG_REFRESH_TXT_NOT_CONNECTION);
+        for (int i = 0; i < mArrMontarPallet.size(); i++ ){
+            String tagComp = mArrMontarPallet.get(i).get("tag").trim();
+            int tamanho = tagId.length();
+            tamanho = tagComp.length();
+            if(tagId.equalsIgnoreCase(tagComp)){
+             mArrMontarPallet.remove(i);
+                saida = true;
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
         }
-        
+
+        return saida;
     }
 
-    private void preencheListMontar() {
-        mHandlerTxt.sendEmptyMessage(MSG_REFRESH_TXT_SEARCHED);
-        mHandler.sendEmptyMessage(MSG_REFRESH_LIST_TAG_MONTAR);
-        mHandlerTxt.sendEmptyMessage(MSG_REFRESH_TXT_FINISH);
+    private boolean adicionarNotEqual(String tagId) {
+        boolean saida = true;
+        for (int i = 0; i < mArrMontarPallet.size(); i++ ){
+            String tagComp = mArrMontarPallet.get(i).get("tag").trim();
+            int tamanho = tagId.length();
+            tamanho = tagComp.length();
+            if(tagId.equalsIgnoreCase(tagComp))
+                saida = false;
+
+        }
+
+        return saida;
     }
 
     private boolean sincDados(String resposta) {
@@ -2523,7 +2754,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         int cont = 0, contWeb = 0;
         try {
             json = new JSONObject(resposta);
-            JSONArray respJson = json.getJSONArray("resp"); // get articles array
+            JSONArray respJson = json.getJSONArray("resp");
             contWeb = respJson.length();
             WineBean wine = new WineBean();
 
@@ -2531,18 +2762,17 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                 wine.setPalete_id(respJson.getJSONObject(i).getString("pallet"));
                 wine.setStatus_pedido_pallet(respJson.getJSONObject(i).getString("status_pedido_pallet"));
 
-                if(wine.getPalete_id().equalsIgnoreCase(mEdtLerPalletMontar.getText().toString()) &&
-                        wine.getStatus_pedido_pallet().equalsIgnoreCase("Aberto")){
+                if(wine.getPalete_id().equalsIgnoreCase(mEdtLerPalletMontar.getText().toString())){
                     JSONArray jArray = (JSONArray) respJson.getJSONObject(i).getJSONArray("caixas_tag");
                     if(jArray != null){
                         mArrMontarPallet.clear();
+
                         mHandler.sendEmptyMessage(MSG_REFRESH_LIST_TAG_MONTAR);
                         for (int j=0; j<jArray.length();j++){
                             wine.addTagId(jArray.getString(j));
                             HashMap<String, String> map = new HashMap<String, String>();
-                            map.put("tag", jArray.getString(j));
+                            map.put("tag", jArray.getString(j).trim());
                             mArrMontarPallet.add(map);
-
                             saida = true;
                         }
                     }

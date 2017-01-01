@@ -32,6 +32,7 @@ public class FachadaWeb extends AsyncTask<String, Void, String>{
     private final String SAVE_WINE = "/savewine/";
     private final String LIST_WINE = "/listwines/";
     private final String LIST_ONE_WINE = "/listonewine/";
+    private final String UPDATE_WINE = "/updatewine/";
     private static String result = "";
 
     HttpClient httpClient = new DefaultHttpClient();
@@ -53,6 +54,10 @@ public class FachadaWeb extends AsyncTask<String, Void, String>{
 
         }else if(params[0].equals("/savewine/")) {
             executePOST(params[0]);
+
+        }else if(params[0].equals("/updatewine/")){
+            executePOST(params[0]);
+
         }
 
         return result;
@@ -194,8 +199,13 @@ public class FachadaWeb extends AsyncTask<String, Void, String>{
         return HOME;
     }
 
+
     public String getSAVE_WINE() {
         return SAVE_WINE;
+    }
+
+    public String getUPDATE_WINE() {
+        return UPDATE_WINE;
     }
 
     public String getLIST_WINE() {
