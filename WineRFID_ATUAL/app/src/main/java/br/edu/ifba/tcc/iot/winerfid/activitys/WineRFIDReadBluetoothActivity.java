@@ -12,6 +12,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -29,10 +30,8 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.RadioButton;
 import android.widget.SeekBar;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
@@ -135,6 +134,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     private boolean BOTAO_ADICIONAR_CAIXA_MONTAR        = false;
     private boolean BOTAO_REMOVER_CAIXA_MONTAR          = false;
     private boolean BOTAO_FECHAR_PALLET_MONTAR          = false;
+    private boolean BOTAO_PROCURAR_TAG                  = false;
 
     // ---------------------------------------------------------------------------- Cadastrar Pallet
     private Button mBtnLerPallet;
@@ -180,6 +180,8 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     private List<String> produtosList           = new ArrayList<String>();
     private List<String> produtosListCode       = new ArrayList<String>();
 
+    private int totalPercent = 0;
+
     private Button mBtnProcurar;
     private EditText mEdtTagProcurar;
 
@@ -191,13 +193,8 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     private SeekBar mSeekPotenciaProcurar;
     private SeekBar mSeekDutyProcurar;
 
-    private RadioButton mRBTag;
-    private RadioButton mRBLote;
-    private RadioButton mRBDestino;
-
-    private ImageView mImLampPrimeiroProcurar;
-    private ImageView mImLampSegundoProcurar;
-    private TextView mTxtImagemProcurar;
+    private ProgressBar mPgbProcurarTag;
+    private TextView mTxtProcurarTag;
 
 
     // -------------------------------------------------------------------------------- Configuração
@@ -224,7 +221,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     private static final String[] TXT_POWER =
             { "Max", "-1dB", "-2dB", "-3dB", "-4dB", "-5dB", "-6dB", "-7dB", "-8dB", "-9dB", "-10dB", "-15dB", "-20dB", "-25dB", "-30dB" };
     private static final int[] TX_POWER =
-            { 0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -15, -20, -25, -30 };
+            { 30, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -15, -20, -25, -30 };
 
     private static final String[] TXT_DUTY =
             {"Max", "90%", "80%", "60%", "40%", "20%", "10%", "5%","4%", "3%", "2%" };
@@ -281,6 +278,8 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     public static final int MSG_REFRESH_LIST_TAG        = 22;
     public static final int MSG_REFRESH_LIST_TAG_PALLET = 23;
     public static final int MSG_REFRESH_LIST_TAG_MONTAR = 24;
+    public static final int MSG_REFRESH_PROGRESS        = 25;
+    public static final int MSG_DISABLE_PROGRESS        = 26;
     public static final int MSG_LINK_ON                 = 30;
     public static final int MSG_LINK_OFF                = 31;
     public static final int MSG_SOUND_RX                = 40;
@@ -491,7 +490,19 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                     }
                         break;
                 }
+                case MSG_REFRESH_PROGRESS:{
+                    if(totalPercent >= 0) {
 
+                        mPgbProcurarTag.setProgress(totalPercent);
+                        mTxtProcurarTag.setText(totalPercent + " %");
+                    }
+                    break;
+                }
+                case MSG_DISABLE_PROGRESS:{
+                    mPgbProcurarTag.setProgress(0);
+                    mTxtProcurarTag.setText("0 %");
+                    break;
+                }
                 case MSG_AUTO_LINK:
                 {
                     if( mAllive == true && mForceDisconnect == false )
@@ -518,30 +529,6 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
                     if( mExit == false )
                         sendEmptyMessageDelayed(MSG_AUTO_LINK, 5000);
-                    break;
-                }
-
-                case MSG_SEARCHED_TAG:
-                {
-                    mTxtImagemProcurar.setText("ENCONTRADO");
-                    mImLampSegundoProcurar.setImageResource(R.drawable.lamp_green);
-                    break;
-                }
-                case MSG_NOT_SEARCHED_TAG:
-                {
-                    mTxtImagemProcurar.setText("PROCURANDO");
-                    mImLampSegundoProcurar.setImageResource(R.drawable.lamp_red);
-                    mImLampSegundoProcurar.setImageResource(R.drawable.lamp_gray);
-
-                    break;
-                }
-
-                case MSG_SEARCH_STOP:
-                {
-                    mImLampSegundoProcurar.setImageResource(R.drawable.lamp_gray);
-                    mImLampPrimeiroProcurar.setImageResource(R.drawable.lamp_red);
-
-
                     break;
                 }
             }
@@ -737,9 +724,9 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         mBtnProcurar            = (Button) findViewById(R.id.btn_procurar);
         mEdtTagProcurar         = (EditText) findViewById(R.id.editTextProcurar);
 
-        mListTagProcurar        = (ListView) findViewById(R.id.list_tagProcurar);
-        adapter = new WineListAdapterCustom(getApplicationContext(), R.layout.list_products);
-        mListTagProcurar.setAdapter(adapter);
+       // mListTagProcurar        = (ListView) findViewById(R.id.list_tagProcurar);
+        //adapter = new WineListAdapterCustom(getApplicationContext(), R.layout.list_products);
+        //mListTagProcurar.setAdapter(adapter);
 
         mTxtPotenciaProcurar    = (TextView) findViewById(R.id.txt_potenciaProcurar) ;
         mTxtRaioProcurar        = (TextView) findViewById(R.id.txt_raioProcurar);
@@ -751,14 +738,11 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         mSeekPotenciaProcurar.setOnSeekBarChangeListener(this);
         mSeekDutyProcurar.setOnSeekBarChangeListener(this);
 
+        mPgbProcurarTag = (ProgressBar) findViewById(R.id.progressBarProcurarTag) ;
+        mTxtProcurarTag = (TextView) findViewById(R.id.textViewPercentoTag) ;
 
-        mRBTag                  = (RadioButton) findViewById(R.id.rbTag) ;
-        mRBLote                 = (RadioButton) findViewById(R.id.rbLote);
-        mRBDestino              = (RadioButton) findViewById(R.id.rbDestino);
-
-        mImLampPrimeiroProcurar = (ImageView) findViewById(R.id.imageViewPrimeiro) ;
-        mImLampSegundoProcurar  = (ImageView) findViewById(R.id.imageViewSegundo);
-        mTxtImagemProcurar      = (TextView) findViewById(R.id.textViewImagemProcurar);
+        mPgbProcurarTag.setMax(100);
+        mPgbProcurarTag.setDrawingCacheBackgroundColor(Color.BLACK);
 
         mBtnProcurar.setOnClickListener(this);
 
@@ -1256,7 +1240,8 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
             }case R.id.buttonGravarCadTag:{
 
                 if(mSpinnerProdutoTagCad.getSelectedItemPosition() == 18){
-                    Toast.makeText(this, ""+ mSpinnerProdutoTagCad.getSelectedItemPosition(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, ""+ mSpinnerProdutoTagCad.getSelectedItemPosition(),
+                            Toast.LENGTH_SHORT).show();
                 }else {
                     final String LABEL = ((Button) v).getText().toString().toUpperCase();
                     if (LABEL.equalsIgnoreCase("Gravar")) {
@@ -1333,19 +1318,22 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
                 break;
             }
 
-            // -------------------------------------------------------------------- onClick procurar
+            // ---------------------------------------------------------------------------- Procurar
             case R.id.btn_procurar:
             {
                 String tagEdit = mEdtTagProcurar.getText().toString();
                 if(tagEdit.equals("")){
-                    Toast.makeText(getApplicationContext(),"Preencha o campo!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(),"Preencha o campo!",
+                            Toast.LENGTH_LONG).show();
                 }else {
                     final String LABEL = ((Button) v).getText().toString();
                     if (LABEL.equalsIgnoreCase("procurar")) {
                         ((Button) v).setText("PARAR");
-                        searchCMD();
+                        setarButton("procurarTag");
+                        setOperation();
                     } else {
                         ((Button) v).setText("PROCURAR");
+                        mHandler.sendEmptyMessage(MSG_DISABLE_PROGRESS);
                         sendCmdStop();
                     }
                 }
@@ -1516,6 +1504,9 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
             criarDialog("Remover Caixa");
             configurarLeituraUnica();
             sendCmdInventory();
+        }else if(BOTAO_PROCURAR_TAG){
+            configurarLeituraContinua();
+            sendCmdInventory();
         }
     }
 
@@ -1548,6 +1539,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         BOTAO_ADICIONAR_CAIXA_MONTAR        = false;
         BOTAO_REMOVER_CAIXA_MONTAR          = false;
         BOTAO_FECHAR_PALLET_MONTAR          = false;
+        BOTAO_PROCURAR_TAG                  = false;
     }
 
     private void setarButton(String readCadTag) {
@@ -1588,17 +1580,11 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
             case "fecharPalletMontar":
                 BOTAO_FECHAR_PALLET_MONTAR = true;
                 break;
+            case "procurarTag":
+                BOTAO_PROCURAR_TAG = true;
+                break;
         }
 
-    }
-
-    private void searchCMD() {
-        //mHandlerSearchView.sendEmptyMessage(MSG_SEARCHING_TAG);
-        configurarLeituraContinua();
-        sendCmdInventory();
-
-        // setupOperationParameter();
-        //sendCmdInventory();
     }
 
 /*--------------------------------- Comandos para salvar no BD do Celular ou Online
@@ -1854,10 +1840,10 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
     public void configurarLeituraContinua()
     {
-        if(BOTAO_LER_TAG_GERAL || BOTAO_ADICIONAR_CAIXA_PALLET){
+
             sendSettingTxPower(TX_POWER[0]);
             sendSettingTxCycle(TX_DUTY_ON[0],TX_DUTY_OFF[0]);
-        }
+
         sendInventParam(mSpinQuerySession.getSelectedItemPosition(),
                 mSpinQueryQ.getSelectedItemPosition(),
                 mSpinTargetAB.getSelectedItemPosition());
@@ -2674,6 +2660,13 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
         }else if( mTabMode == TAB_PROCURAR ){
 
+            if(mEdtTagProcurar.getText().toString().equalsIgnoreCase(tagId)){
+                String num = arrayString[2].substring(3);
+                double percent = Double.parseDouble(num);
+                percent = Math.round(percent);
+                totalPercent = map((int) percent, 80, 30, 0, 100);
+                mHandler.sendEmptyMessage(MSG_REFRESH_PROGRESS);
+            }
 
 
         }else if(mTabMode == TAB_MONTAR_PALLET){
@@ -2716,6 +2709,11 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
             }
         }
         resetVarButonCadTag();
+    }
+
+    private int map(int x, int in_min, int in_max, int out_min, int out_max)
+    {
+        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     }
 
     private boolean removeIsEqual(String tagId) {

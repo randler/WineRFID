@@ -95,7 +95,7 @@
 
     </LinearLayout>
     
-    <!-- Procurar Layout -->
+    <!-- CADASTRAR TAG-->
 	<LinearLayout
 		android:id="@+id/opt_cadastrar"
 		android:layout_width="fill_parent"
@@ -255,6 +255,7 @@
 
 	</LinearLayout>
 
+	<!-- CADASTRAR PALLET -->
 	<LinearLayout android:id="@+id/opt_cadastrar_palete"
 		android:orientation="vertical"
 		android:layout_width="fill_parent"
@@ -394,6 +395,7 @@
         </LinearLayout>
 		</LinearLayout>
 
+	<!-- PROCURAR TAG -->
 	<LinearLayout android:id="@+id/opt_procurar"
 		android:orientation="vertical"
 		android:layout_width="fill_parent"
@@ -497,85 +499,33 @@
 					android:layout_marginRight="5dp" />
 			</LinearLayout>
 
-			<RadioGroup
-				android:id="@+id/rgopcoes"
-				android:layout_width="fill_parent"
-				android:orientation="horizontal"
-				android:layout_height="wrap_content"
-				android:layout_gravity="center"
-				android:gravity="center_horizontal">
 
-				<RadioButton
-					android:id="@+id/rbTag"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:checked="true"
-					android:text="TAG"
-					android:layout_margin="5dp" />
-
-				<RadioButton
-					android:id="@+id/rbLote"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="LOTE"
-					android:layout_margin="5dp" />
-
-				<RadioButton
-					android:id="@+id/rbDestino"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:text="DESTINO"
-					android:layout_margin="5dp" />
-			</RadioGroup>
 
 		</LinearLayout>
 
 		<LinearLayout
 			android:orientation="horizontal"
 			android:layout_width="fill_parent"
-			android:layout_height="wrap_content">
+			android:layout_height="wrap_content"
+			android:layout_margin="8dp">
 
-			<ImageView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:id="@+id/imageViewPrimeiro"
-				android:background="@drawable/lamp_red"
-				android:adjustViewBounds="false"
-				android:baselineAlignBottom="false"
-				android:scaleType="centerCrop"
-				android:layout_gravity="center"
-				android:layout_margin="10dp"
-				android:padding="5dp" />
-
-			<ImageView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:id="@+id/imageViewSegundo"
-				android:background="@drawable/lamp_gray"
-				android:layout_gravity="center"
-				android:layout_margin="10dp"
-				android:padding="5dp" />
-
-			<TextView
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:textAppearance="?android:attr/textAppearanceMedium"
-				android:text="DESATIVADO"
-				android:id="@+id/textViewImagemProcurar"
-				android:layout_weight="8" />
-		</LinearLayout>
-
-		<LinearLayout
-			android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
-			android:orientation = "horizontal"
-			android:layout_weight="0">
-			<ListView android:id="@+id/list_tagProcurar"
+			<ProgressBar
+				style="?android:attr/progressBarStyleHorizontal"
 				android:layout_width="fill_parent"
-				android:layout_height="fill_parent"
-				android:layout_gravity="bottom"
-				android:layout_weight="12"
-				android:layout_margin="5dp" />
+				android:layout_height="wrap_content"
+				android:id="@+id/progressBarProcurarTag"
+				android:layout_weight="5" />
+
+
+
+            <TextView
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				android:text="0 %"
+				android:id="@+id/textViewPercentoTag"
+				android:layout_weight="20"
+                android:gravity="center" />
 		</LinearLayout>
 
 
