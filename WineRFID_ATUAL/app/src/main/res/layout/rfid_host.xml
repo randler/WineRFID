@@ -536,7 +536,23 @@
     	android:layout_width="fill_parent"
     	android:layout_height="fill_parent" 
     	android:orientation="vertical">
-    	<LinearLayout
+
+		<LinearLayout
+			android:orientation="vertical"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content">
+
+			<TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Parametro de Consulta"
+                android:textColor="#284a26"
+                android:textSize="30dp"
+                android:id="@+id/textView13"
+				android:gravity="center" />
+		</LinearLayout>
+
+		<LinearLayout
     		android:layout_width="fill_parent"
     		android:layout_height="wrap_content" >
     		<LinearLayout
@@ -547,43 +563,39 @@
     				android:id="@+id/chk_auto_link"
     				android:layout_width="wrap_content"
     				android:layout_height="wrap_content"
-    				android:text="auto link" />
+    				android:text="Auto Conectar" />
     			<CheckBox
     				android:id="@+id/chk_detect_sound"
     				android:layout_width="wrap_content"
     				android:layout_height="wrap_content"
-    				android:text="detect sound" />
+    				android:text="Som" />
     			<CheckBox
     				android:id="@+id/chk_skip_same"
     				android:layout_width="wrap_content"
     				android:layout_height="wrap_content" 
-    				android:text="skip same"/>
+    				android:text="Sem repetir TAG"/>
     			<CheckBox
     				android:id="@+id/chk_single_tag"
     				android:layout_width="wrap_content"
     				android:layout_height="wrap_content" 
-    				android:text="single tag"/>
+    				android:text="Leitura Unica"/>
     			<CheckBox
     				android:id="@+id/chk_continuous"
     				android:layout_width="wrap_content"
     				android:layout_height="wrap_content" 
     				android:enabled="false"
-    				android:text="continuous"/>
+    				android:text="Leitura Continua"/>
     		</LinearLayout>
     		<LinearLayout
     			android:layout_width="fill_parent"
     			android:layout_height="wrap_content" 
     			android:orientation="vertical"
     			android:layout_marginLeft="10px">
-    			<TextView
-    				android:layout_width="wrap_content"
-    				android:layout_height="wrap_content"
-    				android:text = "Query Parameter"
-    				android:textColor="#ffff00" />
-   				<TextView
+
+				<TextView
    					android:layout_width="wrap_content"
    					android:layout_height="wrap_content"
-   					android:text = "SESSION"/>
+   					android:text = "Seção"/>
     			<LinearLayout
     				android:layout_width="fill_parent"
     				android:layout_height="wrap_content" 
@@ -623,7 +635,7 @@
     				<TextView
     					android:layout_width="wrap_content"
     					android:layout_height="wrap_content"
-    					android:text = "Timeout(S)"/>
+    					android:text = "Tempo de parar"/>
     				<EditText
     					android:id="@+id/edt_query_timeout"
     					android:layout_width="fill_parent"
@@ -642,7 +654,7 @@
 			<TextView
 			    android:layout_width="wrap_content"
 			    android:layout_height="wrap_content"
-			    android:text="Tx Power" />
+			    android:text="Tx Potencia" />
 
 			<TextView
 			    android:id="@+id/txt_power"
@@ -670,7 +682,7 @@
 			<TextView
 			    android:layout_width="wrap_content"
 			    android:layout_height="wrap_content"
-			    android:text="Tx duty" />
+			    android:text="Tx Raio" />
 
 			<TextView
 			    android:id="@+id/txt_duty"
@@ -698,7 +710,7 @@
 			<TextView
 			    android:layout_width="wrap_content"
 			    android:layout_height="wrap_content"
-			    android:text="Battery State" />
+			    android:text="Bateria" />
 
 			<TextView
 			    android:id="@+id/batt_power2"

@@ -1182,6 +1182,11 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
         mArrBtDevice.clear();
         mAdapterDevice.notifyDataSetChanged();
     }
+    private void setPotencia(int power, int raio1, int raio2){
+
+        sendSettingTxPower(power);
+        sendSettingTxCycle(raio1, raio2);
+    }
 
     public void onClick( View v )
     {
@@ -1208,8 +1213,10 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
 
             // --- Inventory
             case R.id.btn_inventory: {
+
                 final String LABEL = ((Button) v).getText().toString().toUpperCase();
                 if (LABEL.equalsIgnoreCase("INICIAR LEITURA")) {
+                    setPotencia(TX_POWER[0], TX_DUTY_ON[0],TX_DUTY_OFF[0]);
                     setarButton("LerGeral");
                     setOperation();
                     ((Button) v).setText("Parar Leitura");
@@ -1293,6 +1300,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
             case R.id.buttonAdicionarCaixaPaleteCad:{
                 final String LABEL = ((Button) v).getText().toString().toUpperCase();
                 if (LABEL.equalsIgnoreCase("Adicionar Caixa")) {
+                    setPotencia(TX_POWER[0], TX_DUTY_ON[0],TX_DUTY_OFF[0]);
                     setarButton("AdicionarCaixaPallet");
                     setOperation();
                     ((Button) v).setText("Parar Leitura");
@@ -1321,6 +1329,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
             // ---------------------------------------------------------------------------- Procurar
             case R.id.btn_procurar:
             {
+                setPotencia(TX_POWER[0], TX_DUTY_ON[0],TX_DUTY_OFF[0]);
                 String tagEdit = mEdtTagProcurar.getText().toString();
                 if(tagEdit.equals("")){
                     Toast.makeText(getApplicationContext(),"Preencha o campo!",
@@ -1787,8 +1796,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     public void configurarLeituraUnica(){
 
 
-        sendSettingTxPower(TX_POWER[14]);
-        sendSettingTxCycle(TX_DUTY_ON[10],TX_DUTY_OFF[10]);
+        setPotencia(TX_POWER[14],TX_DUTY_ON[10],TX_DUTY_OFF[10]);
 
 
         sendInventParam(mSpinQuerySession.getSelectedItemPosition(),
@@ -1835,13 +1843,7 @@ public class WineRFIDReadBluetoothActivity extends BluetoothActivity implements
     public void configurarLeituraContinua()
     {
 
-
-        try {
-            sendSettingTxPower(TX_POWER[1]);
-            sendSettingTxCycle(TX_DUTY_ON[1],TX_DUTY_OFF[1]);
-        }catch (Exception ex){
-
-        }
+        setPotencia(TX_POWER[0], TX_DUTY_ON[0],TX_DUTY_OFF[0]);
 
         sendInventParam(mSpinQuerySession.getSelectedItemPosition(),
                 mSpinQueryQ.getSelectedItemPosition(),
